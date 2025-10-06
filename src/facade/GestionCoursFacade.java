@@ -1,11 +1,13 @@
 package facade;
 
 import User.*;
+import persistence.*;
 import factory.UtilisateurFactory;
 import observer.*;
 import security.Session;
 import state.*;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -19,12 +21,22 @@ public final class GestionCoursFacade {
     private final List<Creneau> creneaux = new ArrayList<>();
     private final Session session = new Session();
     private final List<Inscription> inscriptions = new ArrayList<>();
+    private FichierInscriptionsRepository repoIns;
 
     private CalculPaiement strategiePaiement = new PaiementUneFois();
     private StrategieAffectation strategieAffectation = new AffectationParDisponibilite();
 
     public void initFichierUtilisateurs(String chemin) {
-        gestionnaireUtilisateurs.initialiserFichier(chemin);
+        gestionnaireUtilisateurs.initialiserFichier("src/data/utilisateurs.txt");
+    }
+
+    public void initFichierInscriptions(String chemin) {
+        repoIns = new FichierInscriptionsRepository("src/data/inscriptions.txt");
+        try {
+            inscriptions.addAll(repoIns.charger());
+        } catch (IOException ignored) {
+
+        }
     }
 
     public Optional<Utilisateur> connecter(String email, String motDePasse, Role roleAttendu) {
@@ -38,11 +50,11 @@ public final class GestionCoursFacade {
 
     public Inscription inscrireEnfantDans(Creneau c, String nomEnfant, int age) {
         if (!session.estParent()) throw new SecurityException("Réservé au parent");
-        if (c == null) throw new IllegalArgumentException("Créneau manquant");
-        c.reserver(); // gère plein/état via State + Observer
-        Inscription ins = new Inscription(nomEnfant, age, c);
-        inscriptions.add(ins);
-        return ins;
+        c.reserver();
+        Inscription i = new Inscription(nomEnfant, age, c);
+        inscriptions.add(i);
+        try { if (repoIns != null) repoIns.append(i); } catch (IOException ignored) {}
+        return i;
     }
 
     public List<Inscription> listerInscriptions() { return List.copyOf(inscriptions); }
@@ -99,10 +111,17 @@ public final class GestionCoursFacade {
         return u;
     }
     public Utilisateur bootstrapGestionnaire(Map<String,String> infos) {
-        if (!utilisateursVides()) throw new SecurityException("Déjà initialisé");
-        Utilisateur u = UtilisateurFactory.creerUtilisateur(Role.GESTIONNAIRE, infos);
-        gestionnaireUtilisateurs.enregistrer(u);
-        return u;
+            if (existeGestionnaire()) throw new SecurityException("Déjà initialisé");
+            Utilisateur u = UtilisateurFactory.creerUtilisateur(Role.GESTIONNAIRE, infos);
+            gestionnaireUtilisateurs.enregistrer(u);
+            return u;
     }
 
+    public boolean peutCreerGestionnaireDepuisLogin() {
+        return gestionnaireUtilisateurs.estVide() || !gestionnaireUtilisateurs.existeGestionnaire();
+    }
+
+    public boolean existeGestionnaire() {
+        return gestionnaireUtilisateurs.existeGestionnaire();
+    }
 }

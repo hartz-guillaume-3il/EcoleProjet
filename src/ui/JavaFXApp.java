@@ -32,7 +32,6 @@ import java.util.Optional;
 public class JavaFXApp extends Application {
 
     private final GestionCoursFacade facade = new GestionCoursFacade();
-
     private final ObservableList<Utilisateur> modelUtilisateurs = FXCollections.observableArrayList();
     private final ObservableList<Creneau> modelCreneaux = FXCollections.observableArrayList();
     private final ObservableList<User.Inscription> modelInscriptions = FXCollections.observableArrayList();
@@ -43,6 +42,7 @@ public class JavaFXApp extends Application {
     @Override
     public void start(Stage stage) {
         facade.initFichierUtilisateurs("data/utilisateurs.txt");
+        facade.initFichierInscriptions("data/inscriptions.txt");
 
         if (!dialogueConnexion()) { stage.close(); return; }   // ← d’abord login
 
@@ -82,7 +82,8 @@ public class JavaFXApp extends Application {
             // on laisse choisir le rôle pour la connexion mais la création sera Parent only
         }
 
-        linkCreer.setOnAction(e -> dialogueCreationCompte(bootstrap, email, mdp, champRole));
+        boolean autoriserGest = facade.peutCreerGestionnaireDepuisLogin();
+        linkCreer.setOnAction(e -> dialogueCreationCompte(autoriserGest, email, mdp, champRole));
 
         GridPane gp = new GridPane(); gp.setHgap(8); gp.setVgap(8); gp.setPadding(new Insets(10));
         gp.addRow(0, new Label("Rôle"), champRole);
@@ -120,65 +121,59 @@ public class JavaFXApp extends Application {
         return tabs;
     }
 
-    private void dialogueCreationCompte(boolean bootstrap, TextField emailLogin, PasswordField mdpLogin, ComboBox<String> roleLogin) {
+    private void dialogueCreationCompte(boolean autoriserGest,
+                                        TextField emailLogin,
+                                        PasswordField mdpLogin,
+                                        ComboBox<String> roleLogin) {
         Dialog<Void> dlg = new Dialog<>();
         dlg.setTitle("Créer un compte");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
         ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT","GESTIONNAIRE"));
-        if (bootstrap) {
+        if (autoriserGest) {
             champRole.getSelectionModel().select("GESTIONNAIRE");
         } else {
             champRole.getSelectionModel().select("PARENT");
-            champRole.setDisable(true); // en dehors du bootstrap, uniquement Parent
+            champRole.setDisable(true);
         }
-
-        TextField email = new TextField(); email.setPromptText("email");
+        TextField email  = new TextField();      email.setPromptText("email");
         PasswordField mdp = new PasswordField(); mdp.setPromptText("mot de passe");
-        TextField nom = new TextField(); nom.setPromptText("nom");
-        TextField prenom = new TextField(); prenom.setPromptText("prénom (si parent)");
-
-        GridPane gp = new GridPane(); gp.setHgap(8); gp.setVgap(8); gp.setPadding(new Insets(10));
+        TextField nom    = new TextField();      nom.setPromptText("nom");
+        TextField prenom = new TextField();      prenom.setPromptText("prénom (si parent)");
+        GridPane gp = new GridPane();
+        gp.setHgap(8);
+        gp.setVgap(8);
+        gp.setPadding(new Insets(10));
         gp.addRow(0, new Label("Rôle"), champRole);
         gp.addRow(1, new Label("Email"), email);
         gp.addRow(2, new Label("Mot de passe"), mdp);
         gp.addRow(3, new Label("Nom"), nom);
         gp.addRow(4, new Label("Prénom"), prenom);
         dlg.getDialogPane().setContent(gp);
-
         final Button btOk = (Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
         btOk.addEventFilter(javafx.event.ActionEvent.ACTION, ev -> {
             try {
-                String r = champRole.getValue();
                 Map<String,String> infos = new HashMap<>();
                 infos.put("email", email.getText().trim());
                 infos.put("motDePasse", mdp.getText().trim());
                 infos.put("nom", nom.getText().trim());
                 infos.put("prenom", prenom.getText().trim());
-
-                if ("GESTIONNAIRE".equals(r)) {
-                    facade.bootstrapGestionnaire(infos);  // autorisé seulement si base vide
+                String role = champRole.getValue();
+                if ("GESTIONNAIRE".equals(role)) {
+                    if (!autoriserGest)
+                        throw new SecurityException("Création de gestionnaire non autorisée.");
+                    facade.bootstrapGestionnaire(infos);
                 } else {
-                    facade.autoInscriptionParent(infos);  // autorisé à tout moment
+                    facade.autoInscriptionParent(infos);
                 }
-
-                // Pré-remplir le formulaire de login avec le compte créé
                 emailLogin.setText(infos.get("email"));
                 mdpLogin.setText(infos.get("motDePasse"));
-                roleLogin.getSelectionModel().select(r);
+                roleLogin.getSelectionModel().select(role);
 
-            } catch (SecurityException se) {
-                ev.consume();
-                alerte("Interdit", se.getMessage());
-            } catch (IllegalArgumentException iae) {
-                ev.consume();
-                alerte("Données invalides", iae.getMessage());
             } catch (Exception ex) {
                 ev.consume();
                 alerte("Erreur", ex.getMessage());
             }
         });
-
         dlg.showAndWait();
     }
 

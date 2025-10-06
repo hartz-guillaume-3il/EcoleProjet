@@ -1,6 +1,5 @@
 package User;
 
-import state.Creneau;
 import java.time.Instant;
 
 public final class Inscription {
@@ -8,18 +7,20 @@ public final class Inscription {
     private final int age;
     private final String cours;
     private final String horaireIso;
-    private final Instant horodatage = Instant.now();
+    private final Instant horodatage;
 
-    public Inscription(String nomEnfant, int age, Creneau c) {
-        this.nomEnfant = nomEnfant;
-        this.age = age;
-        this.cours = c.getNomCours();
-        this.horaireIso = c.getHoraire().toString();
+    // créer depuis un créneau
+    public Inscription(String nomEnfant, int age, state.Creneau c) {
+        this(nomEnfant, age, c.getNomCours(), c.getHoraire().toString(), Instant.now());
+    }
+    // rechargement depuis fichier
+    public Inscription(String nomEnfant, int age, String cours, String horaireIso, Instant ts) {
+        this.nomEnfant = nomEnfant; this.age = age; this.cours = cours; this.horaireIso = horaireIso; this.horodatage = ts;
     }
 
-    public String getNomEnfant() { return nomEnfant; }
-    public int getAge() { return age; }
-    public String getCours() { return cours; }
-    public String getHoraireIso() { return horaireIso; }
-    public Instant getHorodatage() { return horodatage; }
+    public String getNomEnfant(){ return nomEnfant; }
+    public int getAge(){ return age; }
+    public String getCours(){ return cours; }
+    public String getHoraireIso(){ return horaireIso; }
+    public Instant getHorodatage(){ return horodatage; }
 }

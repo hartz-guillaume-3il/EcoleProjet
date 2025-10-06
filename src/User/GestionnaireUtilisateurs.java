@@ -15,16 +15,23 @@ public final class GestionnaireUtilisateurs {
     private final Map<String, UUID> idParEmail = new ConcurrentHashMap<>();
     private FichierUtilisateursRepository repo;
 
-    private GestionnaireUtilisateurs() {}
+    private GestionnaireUtilisateurs() {
 
-    // à appeler au démarrage
+    }
+
+    public boolean existeGestionnaire() {
+        return parId.values().stream().anyMatch(u -> u.getRole() == Role.GESTIONNAIRE);
+    }
+
     public synchronized void initialiserFichier(String chemin) {
         this.repo = new FichierUtilisateursRepository(chemin);
+        parId.clear();                     // ← évite état résiduel
+        idParEmail.clear();
         try {
             List<Utilisateur> charges = repo.charger();
             for (Utilisateur u : charges) {
                 parId.put(u.getId(), u);
-                idParEmail.put(u.getEmail().trim().toLowerCase(Locale.ROOT), u.getId());
+                idParEmail.put(normaliser(u.getEmail()), u.getId());
             }
         } catch (IOException e) {
 
