@@ -38,7 +38,7 @@ src/
 ├── observer/        
 ├── state/           
 ├── stockage/        
-├── Strategy/        
+├── strategy/        
 ├── ui/              
 └── User/            
 
@@ -63,7 +63,7 @@ src/
 | **Factory** | Instanciation des modes de paiement et utilisateurs |
 | **Observer** | Notification automatique des parents |
 | **State** | Gestion dynamique des états de créneaux |
-| **Strategy** | Calcul flexible des paiements |
+| **strategy** | Calcul flexible des paiements |
 | **Singleton** | Configuration globale unique |
 | **Facade** | Simplification de l’accès aux modules |
 
