@@ -15,7 +15,18 @@ final class Identifiants {
         this.motDePasseHache = hacher(Objects.requireNonNull(motDePasseClair, "motDePasse"));
     }
 
+    static Identifiants depuisHash(String email, String hashDejaCalcule) {
+        Objects.requireNonNull(email); Objects.requireNonNull(hashDejaCalcule);
+        return new Identifiants(email, hashDejaCalcule, true);
+    }
+
+    private Identifiants(String email, String h, boolean dejaHache) {
+        this.email = email;
+        this.motDePasseHache = h;
+    }
+
     String getEmail() { return email; }
+    String getHash() { return motDePasseHache; }               // ← nouveau
 
     boolean correspond(String motDePasseClair) {
         return motDePasseHache.equals(hacher(motDePasseClair));
@@ -25,7 +36,7 @@ final class Identifiants {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] bytes = md.digest(texte.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(bytes.length * 2);
             for (byte b : bytes) sb.append(String.format("%02x", b));
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {

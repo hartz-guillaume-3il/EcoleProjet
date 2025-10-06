@@ -3,80 +3,81 @@ package facade;
 import User.*;
 import factory.UtilisateurFactory;
 import observer.*;
-import state.Creneau;
-import strategy.affectation.*;
-import strategy.paiement.*;
+import security.Session;
+import state.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public final class GestionCoursFacade {
+import strategy.affectation.*;
+import strategy.paiement.*;
 
+public final class GestionCoursFacade {
     private final GestionnaireUtilisateurs gestionnaireUtilisateurs = GestionnaireUtilisateurs.getInstance();
     private final CentreNotifications notifications = CentreNotifications.getInstance();
     private final List<Creneau> creneaux = new ArrayList<>();
+    private final Session session = new Session();
 
-    // Stratégies courantes
     private CalculPaiement strategiePaiement = new PaiementUneFois();
     private StrategieAffectation strategieAffectation = new AffectationParDisponibilite();
 
-    /** Enregistre un nouvel utilisateur via la Factory */
+    public void initFichierUtilisateurs(String chemin) {
+        gestionnaireUtilisateurs.initialiserFichier(chemin);
+    }
+
+    public Optional<Utilisateur> connecter(String email, String motDePasse, Role roleAttendu) {
+        Optional<Utilisateur> opt = gestionnaireUtilisateurs.authentifier(email, motDePasse);
+        if (opt.isPresent() && opt.get().getRole()==roleAttendu) {
+            session.ouvrir(opt.get());
+            return opt;
+        }
+        return Optional.empty();
+    }
+
+    public void deconnecter() { session.fermer(); }
+    public Session getSession(){ return session; }
+
     public Utilisateur inscrireUtilisateur(Role role, Map<String, String> infos) {
-        Utilisateur utilisateur = UtilisateurFactory.creerUtilisateur(role, infos);
-        gestionnaireUtilisateurs.enregistrer(utilisateur);
-        return utilisateur;
+        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
+        Utilisateur u = UtilisateurFactory.creerUtilisateur(role, infos);
+        gestionnaireUtilisateurs.enregistrer(u);
+        return u;
     }
 
-    /** Authentifie un utilisateur */
-    public Optional<Utilisateur> connecter(String email, String motDePasse) {
-        return gestionnaireUtilisateurs.authentifier(email, motDePasse);
-    }
-
-    /** Ajoute un nouveau créneau de cours */
     public Creneau creerCreneau(String nomCours, LocalDateTime horaire, int capacite) {
+        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
         Creneau c = new Creneau(nomCours, horaire, capacite);
         creneaux.add(c);
         return c;
     }
 
-    /** Affecte un élève à un créneau disponible */
+    public void fermerInscriptions(Creneau c) {
+        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
+        c.changerEtat(new EtatFerme());
+    }
+
+    public void ouvrirInscriptions(Creneau c) {
+        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
+        c.changerEtat(new EtatDisponible());
+    }
+
     public Optional<Creneau> affecterEleve(String nomEleve, int age) {
+        if (!session.estParent()) throw new SecurityException("Réservé au parent");
         Candidat c = new Candidat(nomEleve, age, System.nanoTime());
         Creneau choix = strategieAffectation.choisir(c, creneaux);
         if (choix != null) {
             choix.reserver();
             return Optional.of(choix);
         }
-        notifications.notifierTous(
-                new Notification(TypeEvenement.CRENEAU_ANNULE,
-                        "Aucun créneau disponible pour " + nomEleve,
-                        Map.of("nomEleve", nomEleve)));
+        notifications.notifierTous(new Notification(TypeEvenement.CRENEAU_ANNULE,"Aucun créneau disponible", Map.of("eleve", nomEleve)));
         return Optional.empty();
     }
 
-    /** Calcule un plan de paiement pour un cours */
-    public PlanPaiement calculerPaiement(BigDecimal montant) {
-        return strategiePaiement.calculer(montant);
-    }
+    public PlanPaiement calculerPaiement(BigDecimal montant) { return strategiePaiement.calculer(montant); }
+    public void changerStrategiePaiement(CalculPaiement s) { this.strategiePaiement = s; }
+    public void changerStrategieAffectation(StrategieAffectation s) { this.strategieAffectation = s; }
 
-    /** Permet de changer la stratégie de paiement */
-    public void changerStrategiePaiement(CalculPaiement nouvelleStrategie) {
-        this.strategiePaiement = nouvelleStrategie;
-    }
-
-    /** Permet de changer la stratégie d’affectation */
-    public void changerStrategieAffectation(StrategieAffectation nouvelleStrategie) {
-        this.strategieAffectation = nouvelleStrategie;
-    }
-
-    /** Liste tous les créneaux */
-    public List<Creneau> listerCreneaux() {
-        return List.copyOf(creneaux);
-    }
-
-    /** Liste tous les utilisateurs */
-    public List<Utilisateur> listerUtilisateurs() {
-        return gestionnaireUtilisateurs.listerTous();
-    }
+    public List<Creneau> listerCreneaux() { return List.copyOf(creneaux); }
+    public List<Utilisateur> listerUtilisateurs() { return gestionnaireUtilisateurs.listerTous(); }
 }
