@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,34 +35,30 @@ public class JavaFXApp extends Application {
 
     private final ObservableList<Utilisateur> modelUtilisateurs = FXCollections.observableArrayList();
     private final ObservableList<Creneau> modelCreneaux = FXCollections.observableArrayList();
+    private final ObservableList<User.Inscription> modelInscriptions = FXCollections.observableArrayList();
 
     // Zone de notifications
     private final TextArea zoneLogs = new TextArea();
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Gestion Cours de Soutien — JavaFX");
         facade.initFichierUtilisateurs("data/utilisateurs.txt");
 
-        if (!dialogueConnexion()) {
-            stage.close();
-            return;
-        }
-        // Observer → append dans la zoneLogs
-        Observateur uiLogger = (Notification n) ->
-                zoneLogs.appendText("[" + n.getType() + "] " + n.getMessage() + " " + n.getDonnees() + "\n");
-        CentreNotifications.getInstance().abonner(new ObservateurConsole("Journal"));
-        CentreNotifications.getInstance().abonner(uiLogger);
+        if (!dialogueConnexion()) { stage.close(); return; }   // ← d’abord login
 
         BorderPane root = new BorderPane();
         root.setCenter(creerTabs());
         root.setBottom(creerZoneLogs());
 
+        CentreNotifications.getInstance().abonner(new ObservateurConsole("Journal"));
+        CentreNotifications.getInstance().abonner(n ->
+                zoneLogs.appendText("[" + n.getType() + "] " + n.getMessage() + " " + n.getDonnees() + "\n"));
+
         Scene scene = new Scene(root, 1100, 700);
         stage.setScene(scene);
+        stage.setTitle("Gestion Cours de Soutien — JavaFX");
         stage.show();
 
-        // Refresh init
         rafraichirTables();
     }
 
@@ -69,17 +66,29 @@ public class JavaFXApp extends Application {
         Dialog<Boolean> dlg = new Dialog<>();
         dlg.setTitle("Connexion");
         ButtonType btOk = new ButtonType("Se connecter", ButtonBar.ButtonData.OK_DONE);
-        dlg.getDialogPane().getButtonTypes().addAll(btOk, ButtonType.CANCEL);
+        ButtonType btCancel = ButtonType.CANCEL;
+        dlg.getDialogPane().getButtonTypes().addAll(btOk, btCancel);
 
         ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT","GESTIONNAIRE"));
         champRole.getSelectionModel().selectFirst();
         TextField email = new TextField(); email.setPromptText("email");
         PasswordField mdp = new PasswordField(); mdp.setPromptText("mot de passe");
 
+        Hyperlink linkCreer = new Hyperlink("Créer un compte…");
+
+        // Si base non vide → seule connexion; la création ne propose que Parent
+        boolean bootstrap = facade.utilisateursVides();
+        if (!bootstrap) {
+            // on laisse choisir le rôle pour la connexion mais la création sera Parent only
+        }
+
+        linkCreer.setOnAction(e -> dialogueCreationCompte(bootstrap, email, mdp, champRole));
+
         GridPane gp = new GridPane(); gp.setHgap(8); gp.setVgap(8); gp.setPadding(new Insets(10));
         gp.addRow(0, new Label("Rôle"), champRole);
         gp.addRow(1, new Label("Email"), email);
         gp.addRow(2, new Label("Mot de passe"), mdp);
+        gp.add(linkCreer, 1, 3);
         dlg.getDialogPane().setContent(gp);
 
         dlg.setResultConverter(b -> {
@@ -87,30 +96,90 @@ public class JavaFXApp extends Application {
                 try {
                     Role role = Role.valueOf(champRole.getValue());
                     var ok = facade.connecter(email.getText().trim(), mdp.getText().trim(), role).isPresent();
-                    if (!ok) {
-                        alerte("Connexion", "Identifiants invalides ou rôle incorrect.");
-                        return false;
-                    }
+                    if (!ok) { alerte("Connexion", "Identifiants invalides ou rôle incorrect."); return false; }
                     return true;
-                } catch (Exception e) {
-                    alerte("Erreur", e.getMessage());
-                    return false;
-                }
+                } catch (Exception ex) { alerte("Erreur", ex.getMessage()); return false; }
             }
             return false;
         });
 
-        Optional<Boolean> res = dlg.showAndWait();
-        return res.orElse(false);
+        return dlg.showAndWait().orElse(false);
     }
+
 
     private TabPane creerTabs() {
         TabPane tabs = new TabPane();
-        tabs.getTabs().add(tabUtilisateurs());
+        boolean isGest = facade.getSession().estGestionnaire();
+        boolean isParent = facade.getSession().estParent();
+
         tabs.getTabs().add(tabCreneaux());
-        tabs.getTabs().add(tabPaiements());
+        if (isGest) tabs.getTabs().add(tabUtilisateurs());
+        if (isParent) tabs.getTabs().add(tabInscriptions());
+
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         return tabs;
+    }
+
+    private void dialogueCreationCompte(boolean bootstrap, TextField emailLogin, PasswordField mdpLogin, ComboBox<String> roleLogin) {
+        Dialog<Void> dlg = new Dialog<>();
+        dlg.setTitle("Créer un compte");
+        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT","GESTIONNAIRE"));
+        if (bootstrap) {
+            champRole.getSelectionModel().select("GESTIONNAIRE");
+        } else {
+            champRole.getSelectionModel().select("PARENT");
+            champRole.setDisable(true); // en dehors du bootstrap, uniquement Parent
+        }
+
+        TextField email = new TextField(); email.setPromptText("email");
+        PasswordField mdp = new PasswordField(); mdp.setPromptText("mot de passe");
+        TextField nom = new TextField(); nom.setPromptText("nom");
+        TextField prenom = new TextField(); prenom.setPromptText("prénom (si parent)");
+
+        GridPane gp = new GridPane(); gp.setHgap(8); gp.setVgap(8); gp.setPadding(new Insets(10));
+        gp.addRow(0, new Label("Rôle"), champRole);
+        gp.addRow(1, new Label("Email"), email);
+        gp.addRow(2, new Label("Mot de passe"), mdp);
+        gp.addRow(3, new Label("Nom"), nom);
+        gp.addRow(4, new Label("Prénom"), prenom);
+        dlg.getDialogPane().setContent(gp);
+
+        final Button btOk = (Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(javafx.event.ActionEvent.ACTION, ev -> {
+            try {
+                String r = champRole.getValue();
+                Map<String,String> infos = new HashMap<>();
+                infos.put("email", email.getText().trim());
+                infos.put("motDePasse", mdp.getText().trim());
+                infos.put("nom", nom.getText().trim());
+                infos.put("prenom", prenom.getText().trim());
+
+                if ("GESTIONNAIRE".equals(r)) {
+                    facade.bootstrapGestionnaire(infos);  // autorisé seulement si base vide
+                } else {
+                    facade.autoInscriptionParent(infos);  // autorisé à tout moment
+                }
+
+                // Pré-remplir le formulaire de login avec le compte créé
+                emailLogin.setText(infos.get("email"));
+                mdpLogin.setText(infos.get("motDePasse"));
+                roleLogin.getSelectionModel().select(r);
+
+            } catch (SecurityException se) {
+                ev.consume();
+                alerte("Interdit", se.getMessage());
+            } catch (IllegalArgumentException iae) {
+                ev.consume();
+                alerte("Données invalides", iae.getMessage());
+            } catch (Exception ex) {
+                ev.consume();
+                alerte("Erreur", ex.getMessage());
+            }
+        });
+
+        dlg.showAndWait();
     }
 
     // --- Onglet Utilisateurs (création réservée au gestionnaire) ---
@@ -169,6 +238,74 @@ public class JavaFXApp extends Application {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         VBox box = new VBox(form, table);
+        tab.setContent(box);
+        return tab;
+    }
+
+    private Tab tabInscriptions() {
+        Tab tab = new Tab("Inscriptions");
+
+        // Formulaire parent
+        TextField champNomEnfant = new TextField(); champNomEnfant.setPromptText("Nom de l’enfant");
+        TextField champAge = new TextField(); champAge.setPromptText("Âge");
+        Button btnInscrire = new Button("Inscrire au créneau sélectionné");
+
+        // Table créneaux pour choisir la cible
+        TableView<Creneau> tableCreneaux = new TableView<>(modelCreneaux);
+        TableColumn<Creneau,String> cCours = new TableColumn<>("Cours");
+        cCours.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNomCours()));
+        TableColumn<Creneau,String> cHoraire = new TableColumn<>("Horaire");
+        cHoraire.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getHoraire().toString()));
+        TableColumn<Creneau,String> cPlaces = new TableColumn<>("Places");
+        cPlaces.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInscrits()+"/"+c.getValue().getCapaciteMax()));
+        TableColumn<Creneau,String> cEtat = new TableColumn<>("État");
+        cEtat.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEtat().getNomEtat()));
+        tableCreneaux.getColumns().addAll(cCours, cHoraire, cPlaces, cEtat);
+        tableCreneaux.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+        tableCreneaux.setPrefHeight(220);
+
+        // Table des inscriptions
+        TableView<User.Inscription> tableIns = new TableView<>(modelInscriptions);
+        TableColumn<User.Inscription,String> iNom = new TableColumn<>("Enfant");
+        iNom.setCellValueFactory(i -> new SimpleStringProperty(i.getValue().getNomEnfant()));
+        TableColumn<User.Inscription,String> iAge = new TableColumn<>("Âge");
+        iAge.setCellValueFactory(i -> new SimpleStringProperty(String.valueOf(i.getValue().getAge())));
+        TableColumn<User.Inscription,String> iCours = new TableColumn<>("Cours");
+        iCours.setCellValueFactory(i -> new SimpleStringProperty(i.getValue().getCours()));
+        TableColumn<User.Inscription,String> iHoraire = new TableColumn<>("Horaire");
+        iHoraire.setCellValueFactory(i -> new SimpleStringProperty(i.getValue().getHoraireIso()));
+        tableIns.getColumns().addAll(iNom, iAge, iCours, iHoraire);
+        tableIns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+
+        btnInscrire.setOnAction(e -> {
+            try {
+                if (!facade.getSession().estParent()) {
+                    alerte("Droits insuffisants", "Action réservée au parent.");
+                    return;
+                }
+                Creneau cible = tableCreneaux.getSelectionModel().getSelectedItem();
+                if (cible == null) { alerte("Sélection", "Choisis un créneau."); return; }
+                int age = Integer.parseInt(champAge.getText().trim());
+                var ins = facade.inscrireEnfantDans(cible, champNomEnfant.getText().trim(), age);
+                zoneLogs.appendText("[OK] Inscription de " + ins.getNomEnfant() + " sur " + ins.getCours() + "\n");
+                rafraichirCreneaux();
+                rafraichirInscriptions();
+            } catch (NumberFormatException ex) {
+                alerte("Âge invalide", "Saisis un entier.");
+            } catch (Exception ex) {
+                alerte("Erreur", ex.getMessage());
+            }
+        });
+
+        // Règle de droits
+        boolean isParent = facade.getSession().estParent();
+        champNomEnfant.setDisable(!isParent);
+        champAge.setDisable(!isParent);
+        btnInscrire.setDisable(!isParent);
+
+        HBox form = new HBox(10, champNomEnfant, champAge, btnInscrire);
+        form.setPadding(new Insets(10));
+        VBox box = new VBox(new Label("Choisir un créneau"), tableCreneaux, form, new Label("Inscriptions"), tableIns);
         tab.setContent(box);
         return tab;
     }
@@ -351,6 +488,7 @@ public class JavaFXApp extends Application {
     private void rafraichirTables() {
         rafraichirUtilisateurs();
         rafraichirCreneaux();
+        rafraichirInscriptions();
     }
 
     private void rafraichirUtilisateurs() {
@@ -365,5 +503,9 @@ public class JavaFXApp extends Application {
         Alert a = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
         a.setTitle(titre);
         a.showAndWait();
+    }
+
+    private void rafraichirInscriptions() {
+        modelInscriptions.setAll(facade.listerInscriptions());
     }
 }

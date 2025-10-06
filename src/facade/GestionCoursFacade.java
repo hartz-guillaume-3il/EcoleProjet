@@ -18,6 +18,7 @@ public final class GestionCoursFacade {
     private final CentreNotifications notifications = CentreNotifications.getInstance();
     private final List<Creneau> creneaux = new ArrayList<>();
     private final Session session = new Session();
+    private final List<Inscription> inscriptions = new ArrayList<>();
 
     private CalculPaiement strategiePaiement = new PaiementUneFois();
     private StrategieAffectation strategieAffectation = new AffectationParDisponibilite();
@@ -35,6 +36,16 @@ public final class GestionCoursFacade {
         return Optional.empty();
     }
 
+    public Inscription inscrireEnfantDans(Creneau c, String nomEnfant, int age) {
+        if (!session.estParent()) throw new SecurityException("Réservé au parent");
+        if (c == null) throw new IllegalArgumentException("Créneau manquant");
+        c.reserver(); // gère plein/état via State + Observer
+        Inscription ins = new Inscription(nomEnfant, age, c);
+        inscriptions.add(ins);
+        return ins;
+    }
+
+    public List<Inscription> listerInscriptions() { return List.copyOf(inscriptions); }
     public void deconnecter() { session.fermer(); }
     public Session getSession(){ return session; }
 
@@ -80,4 +91,18 @@ public final class GestionCoursFacade {
 
     public List<Creneau> listerCreneaux() { return List.copyOf(creneaux); }
     public List<Utilisateur> listerUtilisateurs() { return gestionnaireUtilisateurs.listerTous(); }
+    public boolean utilisateursVides() { return gestionnaireUtilisateurs.estVide(); }
+
+    public Utilisateur autoInscriptionParent(Map<String,String> infos) {
+        Utilisateur u = UtilisateurFactory.creerUtilisateur(Role.PARENT, infos);
+        gestionnaireUtilisateurs.enregistrer(u);
+        return u;
+    }
+    public Utilisateur bootstrapGestionnaire(Map<String,String> infos) {
+        if (!utilisateursVides()) throw new SecurityException("Déjà initialisé");
+        Utilisateur u = UtilisateurFactory.creerUtilisateur(Role.GESTIONNAIRE, infos);
+        gestionnaireUtilisateurs.enregistrer(u);
+        return u;
+    }
+
 }

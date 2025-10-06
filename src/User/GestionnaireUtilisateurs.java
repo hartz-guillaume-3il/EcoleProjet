@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public final class GestionnaireUtilisateurs {
     private static final GestionnaireUtilisateurs INSTANCE = new GestionnaireUtilisateurs();
     public static GestionnaireUtilisateurs getInstance() { return INSTANCE; }
-
+    public boolean estVide() { return idParEmail.isEmpty(); }
     private final Map<UUID, Utilisateur> parId = new ConcurrentHashMap<>();
     private final Map<String, UUID> idParEmail = new ConcurrentHashMap<>();
     private FichierUtilisateursRepository repo;
