@@ -1,0 +1,10 @@
+package observer;
+
+public enum TypeEvenement {
+    ECHEANCE_PAIEMENT,
+    PAIEMENT_RECU,
+    CRENEAU_CONFIRME,
+    CRENEAU_ANNULE,
+    CRENEAU_DEVENU_COMPLET,
+    CRENEAU_REDEVENU_DISPONIBLE
+}
