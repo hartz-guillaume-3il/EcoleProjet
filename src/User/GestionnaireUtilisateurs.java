@@ -9,8 +9,15 @@ import java.util.stream.Collectors;
 
 public final class GestionnaireUtilisateurs {
     private static final GestionnaireUtilisateurs INSTANCE = new GestionnaireUtilisateurs();
-    public static GestionnaireUtilisateurs getInstance() { return INSTANCE; }
-    public boolean estVide() { return idParEmail.isEmpty(); }
+
+    public static GestionnaireUtilisateurs getInstance() {
+        return INSTANCE;
+    }
+
+    public boolean estVide() {
+        return idParEmail.isEmpty();
+    }
+
     private final Map<UUID, Utilisateur> parId = new ConcurrentHashMap<>();
     private final Map<String, UUID> idParEmail = new ConcurrentHashMap<>();
     private FichierUtilisateursRepository repo;
@@ -46,7 +53,10 @@ public final class GestionnaireUtilisateurs {
         parId.put(utilisateur.getId(), utilisateur);
         idParEmail.put(cle, utilisateur.getId());
         if (repo != null) {
-            try { repo.append(utilisateur); } catch (IOException ignored) {}
+            try {
+                repo.append(utilisateur);
+            } catch (IOException ignored) {
+            }
         }
         return utilisateur;
     }
@@ -58,9 +68,17 @@ public final class GestionnaireUtilisateurs {
         return (u != null && u.verifierMotDePasse(motDePasse)) ? Optional.of(u) : Optional.empty();
     }
 
-    public List<Utilisateur> listerTous() { return List.copyOf(parId.values()); }
-    public List<Parent> listerParents() { return parId.values().stream().filter(u->u.getRole()==Role.PARENT).map(u->(Parent)u).collect(Collectors.toList()); }
-    public List<Gestionnaire> listerGestionnaires(){ return parId.values().stream().filter(u->u.getRole()==Role.GESTIONNAIRE).map(u->(Gestionnaire)u).collect(Collectors.toList()); }
+    public List<Utilisateur> listerTous() {
+        return List.copyOf(parId.values());
+    }
+
+    public List<Parent> listerParents() {
+        return parId.values().stream().filter(u -> u.getRole() == Role.PARENT).map(u -> (Parent) u).collect(Collectors.toList());
+    }
+
+    public List<Gestionnaire> listerGestionnaires() {
+        return parId.values().stream().filter(u -> u.getRole() == Role.GESTIONNAIRE).map(u -> (Gestionnaire) u).collect(Collectors.toList());
+    }
 
     private static String normaliser(String email) {
         return Objects.requireNonNull(email).trim().toLowerCase(Locale.ROOT);

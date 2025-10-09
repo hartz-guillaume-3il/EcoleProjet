@@ -12,6 +12,7 @@ public abstract class Utilisateur {
         this.identifiants = new Identifiants(email, motDePasse);
         this.role = role;
     }
+
     // constructeur alternatif depuis hash (persistance)
     protected Utilisateur(String email, String hashDejaCalcule, Role role, boolean depuisHash) {
         this.id = UUID.randomUUID();
@@ -19,9 +20,23 @@ public abstract class Utilisateur {
         this.role = role;
     }
 
-    public UUID getId() { return id; }
-    public String getEmail() { return identifiants.getEmail(); }
-    public Role getRole() { return role; }
-    public boolean verifierMotDePasse(String motDePasse) { return identifiants.correspond(motDePasse); }
-    public String getEmpreinte() { return identifiants.getHash(); }   // ← pour l’écriture .txt
+    public UUID getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return identifiants.getEmail();
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public boolean verifierMotDePasse(String motDePasse) {
+        return identifiants.correspond(motDePasse);
+    }
+
+    public String getEmpreinte() {
+        return identifiants.getHash();
+    }   // ← pour l’écriture .txt
 }

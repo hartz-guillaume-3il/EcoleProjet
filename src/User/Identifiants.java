@@ -5,7 +5,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
-/** Gère la sécurité des identifiants (email + mot de passe haché). */
+/**
+ * Gère la sécurité des identifiants (email + mot de passe haché).
+ */
 final class Identifiants {
     private final String email;
     private final String motDePasseHache;
@@ -16,7 +18,8 @@ final class Identifiants {
     }
 
     static Identifiants depuisHash(String email, String hashDejaCalcule) {
-        Objects.requireNonNull(email); Objects.requireNonNull(hashDejaCalcule);
+        Objects.requireNonNull(email);
+        Objects.requireNonNull(hashDejaCalcule);
         return new Identifiants(email, hashDejaCalcule, true);
     }
 
@@ -25,8 +28,13 @@ final class Identifiants {
         this.motDePasseHache = h;
     }
 
-    String getEmail() { return email; }
-    String getHash() { return motDePasseHache; }               // ← nouveau
+    String getEmail() {
+        return email;
+    }
+
+    String getHash() {
+        return motDePasseHache;
+    }               // ← nouveau
 
     boolean correspond(String motDePasseClair) {
         return motDePasseHache.equals(hacher(motDePasseClair));

@@ -13,14 +13,33 @@ public final class Inscription {
     public Inscription(String nomEnfant, int age, state.Creneau c) {
         this(nomEnfant, age, c.getNomCours(), c.getHoraire().toString(), Instant.now());
     }
+
     // rechargement depuis fichier
     public Inscription(String nomEnfant, int age, String cours, String horaireIso, Instant ts) {
-        this.nomEnfant = nomEnfant; this.age = age; this.cours = cours; this.horaireIso = horaireIso; this.horodatage = ts;
+        this.nomEnfant = nomEnfant;
+        this.age = age;
+        this.cours = cours;
+        this.horaireIso = horaireIso;
+        this.horodatage = ts;
     }
 
-    public String getNomEnfant(){ return nomEnfant; }
-    public int getAge(){ return age; }
-    public String getCours(){ return cours; }
-    public String getHoraireIso(){ return horaireIso; }
-    public Instant getHorodatage(){ return horodatage; }
+    public String getNomEnfant() {
+        return nomEnfant;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getCours() {
+        return cours;
+    }
+
+    public String getHoraireIso() {
+        return horaireIso;
+    }
+
+    public Instant getHorodatage() {
+        return horodatage;
+    }
 }

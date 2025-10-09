@@ -7,11 +7,14 @@ public final class Gestionnaire extends Utilisateur {
         super(email, motDePasse, Role.GESTIONNAIRE);
         this.nom = nom;
     }
+
     // depuis hash
     public Gestionnaire(String email, String hash, String nom, boolean depuisHash) {
         super(email, hash, Role.GESTIONNAIRE, true);
         this.nom = nom;
     }
 
-    public String getNom() { return nom; }
+    public String getNom() {
+        return nom;
+    }
 }

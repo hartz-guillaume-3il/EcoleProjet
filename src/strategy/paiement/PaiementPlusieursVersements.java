@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Jusqu’à 6 versements. Option frais fixe par versement. */
+/**
+ * Jusqu’à 6 versements. Option frais fixe par versement.
+ */
 public final class PaiementPlusieursVersements implements CalculPaiement {
     private final int nbVersements;          // 2..6
     private final BigDecimal fraisParEcheance; // peut être 0
@@ -37,5 +39,8 @@ public final class PaiementPlusieursVersements implements CalculPaiement {
         return new PlanPaiement(es, total);
     }
 
-    @Override public String nom() { return "Paiement en " + nbVersements + " versements"; }
+    @Override
+    public String nom() {
+        return "Paiement en " + nbVersements + " versements";
+    }
 }

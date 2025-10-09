@@ -7,7 +7,9 @@ import observer.TypeEvenement;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/** Contexte State + publication d’événements vers l’Observer. */
+/**
+ * Contexte State + publication d’événements vers l’Observer.
+ */
 public final class Creneau {
     private final String nomCours;
     private final LocalDateTime horaire;
@@ -23,19 +25,41 @@ public final class Creneau {
         this.etat = new EtatDisponible();
     }
 
-    public void changerEtat(EtatCreneau nouvelEtat) { this.etat = nouvelEtat; }
+    public void changerEtat(EtatCreneau nouvelEtat) {
+        this.etat = nouvelEtat;
+    }
 
-    public void reserver() { etat.reserver(this); }
+    public void reserver() {
+        etat.reserver(this);
+    }
 
-    public void annuler() { etat.annuler(this); }
+    public void annuler() {
+        etat.annuler(this);
+    }
 
-    public void afficherEtat() { etat.afficherEtat(); }
+    public void afficherEtat() {
+        etat.afficherEtat();
+    }
 
-    public String getNomCours() { return nomCours; }
-    public int getInscrits() { return inscrits; }
-    public int getCapaciteMax() { return capaciteMax; }
-    public LocalDateTime getHoraire() { return horaire; }
-    public EtatCreneau getEtat() { return etat; }
+    public String getNomCours() {
+        return nomCours;
+    }
+
+    public int getInscrits() {
+        return inscrits;
+    }
+
+    public int getCapaciteMax() {
+        return capaciteMax;
+    }
+
+    public LocalDateTime getHoraire() {
+        return horaire;
+    }
+
+    public EtatCreneau getEtat() {
+        return etat;
+    }
 
     public void incrementerInscrits() {
         inscrits++;

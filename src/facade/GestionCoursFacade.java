@@ -41,7 +41,7 @@ public final class GestionCoursFacade {
 
     public Optional<Utilisateur> connecter(String email, String motDePasse, Role roleAttendu) {
         Optional<Utilisateur> opt = gestionnaireUtilisateurs.authentifier(email, motDePasse);
-        if (opt.isPresent() && opt.get().getRole()==roleAttendu) {
+        if (opt.isPresent() && opt.get().getRole() == roleAttendu) {
             session.ouvrir(opt.get());
             return opt;
         }
@@ -53,13 +53,24 @@ public final class GestionCoursFacade {
         c.reserver();
         Inscription i = new Inscription(nomEnfant, age, c);
         inscriptions.add(i);
-        try { if (repoIns != null) repoIns.append(i); } catch (IOException ignored) {}
+        try {
+            if (repoIns != null) repoIns.append(i);
+        } catch (IOException ignored) {
+        }
         return i;
     }
 
-    public List<Inscription> listerInscriptions() { return List.copyOf(inscriptions); }
-    public void deconnecter() { session.fermer(); }
-    public Session getSession(){ return session; }
+    public List<Inscription> listerInscriptions() {
+        return List.copyOf(inscriptions);
+    }
+
+    public void deconnecter() {
+        session.fermer();
+    }
+
+    public Session getSession() {
+        return session;
+    }
 
     public Utilisateur inscrireUtilisateur(Role role, Map<String, String> infos) {
         if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
@@ -93,28 +104,45 @@ public final class GestionCoursFacade {
             choix.reserver();
             return Optional.of(choix);
         }
-        notifications.notifierTous(new Notification(TypeEvenement.CRENEAU_ANNULE,"Aucun créneau disponible", Map.of("eleve", nomEleve)));
+        notifications.notifierTous(new Notification(TypeEvenement.CRENEAU_ANNULE, "Aucun créneau disponible", Map.of("eleve", nomEleve)));
         return Optional.empty();
     }
 
-    public PlanPaiement calculerPaiement(BigDecimal montant) { return strategiePaiement.calculer(montant); }
-    public void changerStrategiePaiement(CalculPaiement s) { this.strategiePaiement = s; }
-    public void changerStrategieAffectation(StrategieAffectation s) { this.strategieAffectation = s; }
+    public PlanPaiement calculerPaiement(BigDecimal montant) {
+        return strategiePaiement.calculer(montant);
+    }
 
-    public List<Creneau> listerCreneaux() { return List.copyOf(creneaux); }
-    public List<Utilisateur> listerUtilisateurs() { return gestionnaireUtilisateurs.listerTous(); }
-    public boolean utilisateursVides() { return gestionnaireUtilisateurs.estVide(); }
+    public void changerStrategiePaiement(CalculPaiement s) {
+        this.strategiePaiement = s;
+    }
 
-    public Utilisateur autoInscriptionParent(Map<String,String> infos) {
+    public void changerStrategieAffectation(StrategieAffectation s) {
+        this.strategieAffectation = s;
+    }
+
+    public List<Creneau> listerCreneaux() {
+        return List.copyOf(creneaux);
+    }
+
+    public List<Utilisateur> listerUtilisateurs() {
+        return gestionnaireUtilisateurs.listerTous();
+    }
+
+    public boolean utilisateursVides() {
+        return gestionnaireUtilisateurs.estVide();
+    }
+
+    public Utilisateur autoInscriptionParent(Map<String, String> infos) {
         Utilisateur u = UtilisateurFactory.creerUtilisateur(Role.PARENT, infos);
         gestionnaireUtilisateurs.enregistrer(u);
         return u;
     }
-    public Utilisateur bootstrapGestionnaire(Map<String,String> infos) {
-            if (existeGestionnaire()) throw new SecurityException("Déjà initialisé");
-            Utilisateur u = UtilisateurFactory.creerUtilisateur(Role.GESTIONNAIRE, infos);
-            gestionnaireUtilisateurs.enregistrer(u);
-            return u;
+
+    public Utilisateur bootstrapGestionnaire(Map<String, String> infos) {
+        if (existeGestionnaire()) throw new SecurityException("Déjà initialisé");
+        Utilisateur u = UtilisateurFactory.creerUtilisateur(Role.GESTIONNAIRE, infos);
+        gestionnaireUtilisateurs.enregistrer(u);
+        return u;
     }
 
     public boolean peutCreerGestionnaireDepuisLogin() {

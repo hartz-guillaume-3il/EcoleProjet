@@ -18,7 +18,9 @@ public final class FichierUtilisateursRepository {
         this.path = Paths.get(cheminFichier);
     }
 
-    /** Lecture complète du fichier → liste d'utilisateurs. */
+    /**
+     * Lecture complète du fichier → liste d'utilisateurs.
+     */
     public List<Utilisateur> charger() throws IOException {
         if (Files.notExists(path)) return List.of();
         List<Utilisateur> out = new ArrayList<>();
@@ -44,34 +46,50 @@ public final class FichierUtilisateursRepository {
         return out;
     }
 
-    /** Ajoute un utilisateur en fin de fichier. */
+    /**
+     * Ajoute un utilisateur en fin de fichier.
+     */
     public synchronized void append(Utilisateur u) throws IOException {
         Files.createDirectories(path.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             String nom = "", prenom = "";
-            if (u instanceof Parent p) { nom = p.getNom(); prenom = p.getPrenom(); }
-            else if (u instanceof Gestionnaire g) { nom = g.getNom(); }
+            if (u instanceof Parent p) {
+                nom = p.getNom();
+                prenom = p.getPrenom();
+            } else if (u instanceof Gestionnaire g) {
+                nom = g.getNom();
+            }
             bw.write(u.getEmail() + ";" + u.getEmpreinte() + ";" + nom + ";" + prenom + ";" + u.getRole());
             bw.newLine();
         }
     }
 
-    /** Réécrit l'intégralité du fichier à partir d'une collection. */
+    /**
+     * Réécrit l'intégralité du fichier à partir d'une collection.
+     */
     public synchronized void ecrireTous(Collection<Utilisateur> users) throws IOException {
         Files.createDirectories(path.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
             for (Utilisateur u : users) {
                 String nom = "", prenom = "";
-                if (u instanceof Parent p) { nom = p.getNom(); prenom = p.getPrenom(); }
-                else if (u instanceof Gestionnaire g) { nom = g.getNom(); }
+                if (u instanceof Parent p) {
+                    nom = p.getNom();
+                    prenom = p.getPrenom();
+                } else if (u instanceof Gestionnaire g) {
+                    nom = g.getNom();
+                }
                 bw.write(u.getEmail() + ";" + u.getEmpreinte() + ";" + nom + ";" + prenom + ";" + u.getRole());
                 bw.newLine();
             }
         }
     }
 
-    /** Chemin du fichier pour debug/tests. */
-    public Path getPath() { return path; }
+    /**
+     * Chemin du fichier pour debug/tests.
+     */
+    public Path getPath() {
+        return path;
+    }
 }

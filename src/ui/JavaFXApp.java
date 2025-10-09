@@ -44,7 +44,10 @@ public class JavaFXApp extends Application {
         facade.initFichierUtilisateurs("data/utilisateurs.txt");
         facade.initFichierInscriptions("data/inscriptions.txt");
 
-        if (!dialogueConnexion()) { stage.close(); return; }   // ← d’abord login
+        if (!dialogueConnexion()) {
+            stage.close();
+            return;
+        }   // ← d’abord login
 
         BorderPane root = new BorderPane();
         root.setCenter(creerTabs());
@@ -69,10 +72,12 @@ public class JavaFXApp extends Application {
         ButtonType btCancel = ButtonType.CANCEL;
         dlg.getDialogPane().getButtonTypes().addAll(btOk, btCancel);
 
-        ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT","GESTIONNAIRE"));
+        ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT", "GESTIONNAIRE"));
         champRole.getSelectionModel().selectFirst();
-        TextField email = new TextField(); email.setPromptText("email");
-        PasswordField mdp = new PasswordField(); mdp.setPromptText("mot de passe");
+        TextField email = new TextField();
+        email.setPromptText("email");
+        PasswordField mdp = new PasswordField();
+        mdp.setPromptText("mot de passe");
 
         Hyperlink linkCreer = new Hyperlink("Créer un compte…");
 
@@ -85,7 +90,10 @@ public class JavaFXApp extends Application {
         boolean autoriserGest = facade.peutCreerGestionnaireDepuisLogin();
         linkCreer.setOnAction(e -> dialogueCreationCompte(autoriserGest, email, mdp, champRole));
 
-        GridPane gp = new GridPane(); gp.setHgap(8); gp.setVgap(8); gp.setPadding(new Insets(10));
+        GridPane gp = new GridPane();
+        gp.setHgap(8);
+        gp.setVgap(8);
+        gp.setPadding(new Insets(10));
         gp.addRow(0, new Label("Rôle"), champRole);
         gp.addRow(1, new Label("Email"), email);
         gp.addRow(2, new Label("Mot de passe"), mdp);
@@ -97,9 +105,15 @@ public class JavaFXApp extends Application {
                 try {
                     Role role = Role.valueOf(champRole.getValue());
                     var ok = facade.connecter(email.getText().trim(), mdp.getText().trim(), role).isPresent();
-                    if (!ok) { alerte("Connexion", "Identifiants invalides ou rôle incorrect."); return false; }
+                    if (!ok) {
+                        alerte("Connexion", "Identifiants invalides ou rôle incorrect.");
+                        return false;
+                    }
                     return true;
-                } catch (Exception ex) { alerte("Erreur", ex.getMessage()); return false; }
+                } catch (Exception ex) {
+                    alerte("Erreur", ex.getMessage());
+                    return false;
+                }
             }
             return false;
         });
@@ -128,17 +142,21 @@ public class JavaFXApp extends Application {
         Dialog<Void> dlg = new Dialog<>();
         dlg.setTitle("Créer un compte");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT","GESTIONNAIRE"));
+        ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT", "GESTIONNAIRE"));
         if (autoriserGest) {
             champRole.getSelectionModel().select("GESTIONNAIRE");
         } else {
             champRole.getSelectionModel().select("PARENT");
             champRole.setDisable(true);
         }
-        TextField email  = new TextField();      email.setPromptText("email");
-        PasswordField mdp = new PasswordField(); mdp.setPromptText("mot de passe");
-        TextField nom    = new TextField();      nom.setPromptText("nom");
-        TextField prenom = new TextField();      prenom.setPromptText("prénom (si parent)");
+        TextField email = new TextField();
+        email.setPromptText("email");
+        PasswordField mdp = new PasswordField();
+        mdp.setPromptText("mot de passe");
+        TextField nom = new TextField();
+        nom.setPromptText("nom");
+        TextField prenom = new TextField();
+        prenom.setPromptText("prénom (si parent)");
         GridPane gp = new GridPane();
         gp.setHgap(8);
         gp.setVgap(8);
@@ -152,7 +170,7 @@ public class JavaFXApp extends Application {
         final Button btOk = (Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
         btOk.addEventFilter(javafx.event.ActionEvent.ACTION, ev -> {
             try {
-                Map<String,String> infos = new HashMap<>();
+                Map<String, String> infos = new HashMap<>();
                 infos.put("email", email.getText().trim());
                 infos.put("motDePasse", mdp.getText().trim());
                 infos.put("nom", nom.getText().trim());
@@ -184,10 +202,14 @@ public class JavaFXApp extends Application {
         // Formulaire
         ComboBox<String> champRole = new ComboBox<>(FXCollections.observableArrayList("PARENT", "GESTIONNAIRE"));
         champRole.getSelectionModel().selectFirst();
-        TextField champEmail = new TextField(); champEmail.setPromptText("email");
-        PasswordField champMdp = new PasswordField(); champMdp.setPromptText("mot de passe");
-        TextField champNom = new TextField(); champNom.setPromptText("nom");
-        TextField champPrenom = new TextField(); champPrenom.setPromptText("prénom (parents)");
+        TextField champEmail = new TextField();
+        champEmail.setPromptText("email");
+        PasswordField champMdp = new PasswordField();
+        champMdp.setPromptText("mot de passe");
+        TextField champNom = new TextField();
+        champNom.setPromptText("nom");
+        TextField champPrenom = new TextField();
+        champPrenom.setPromptText("prénom (parents)");
 
         Button btnCreer = new Button("Créer");
         btnCreer.setOnAction(e -> {
@@ -241,19 +263,21 @@ public class JavaFXApp extends Application {
         Tab tab = new Tab("Inscriptions");
 
         // Formulaire parent
-        TextField champNomEnfant = new TextField(); champNomEnfant.setPromptText("Nom de l’enfant");
-        TextField champAge = new TextField(); champAge.setPromptText("Âge");
+        TextField champNomEnfant = new TextField();
+        champNomEnfant.setPromptText("Nom de l’enfant");
+        TextField champAge = new TextField();
+        champAge.setPromptText("Âge");
         Button btnInscrire = new Button("Inscrire au créneau sélectionné");
 
         // Table créneaux pour choisir la cible
         TableView<Creneau> tableCreneaux = new TableView<>(modelCreneaux);
-        TableColumn<Creneau,String> cCours = new TableColumn<>("Cours");
+        TableColumn<Creneau, String> cCours = new TableColumn<>("Cours");
         cCours.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNomCours()));
-        TableColumn<Creneau,String> cHoraire = new TableColumn<>("Horaire");
+        TableColumn<Creneau, String> cHoraire = new TableColumn<>("Horaire");
         cHoraire.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getHoraire().toString()));
-        TableColumn<Creneau,String> cPlaces = new TableColumn<>("Places");
-        cPlaces.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInscrits()+"/"+c.getValue().getCapaciteMax()));
-        TableColumn<Creneau,String> cEtat = new TableColumn<>("État");
+        TableColumn<Creneau, String> cPlaces = new TableColumn<>("Places");
+        cPlaces.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInscrits() + "/" + c.getValue().getCapaciteMax()));
+        TableColumn<Creneau, String> cEtat = new TableColumn<>("État");
         cEtat.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEtat().getNomEtat()));
         tableCreneaux.getColumns().addAll(cCours, cHoraire, cPlaces, cEtat);
         tableCreneaux.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
@@ -261,13 +285,13 @@ public class JavaFXApp extends Application {
 
         // Table des inscriptions
         TableView<User.Inscription> tableIns = new TableView<>(modelInscriptions);
-        TableColumn<User.Inscription,String> iNom = new TableColumn<>("Enfant");
+        TableColumn<User.Inscription, String> iNom = new TableColumn<>("Enfant");
         iNom.setCellValueFactory(i -> new SimpleStringProperty(i.getValue().getNomEnfant()));
-        TableColumn<User.Inscription,String> iAge = new TableColumn<>("Âge");
+        TableColumn<User.Inscription, String> iAge = new TableColumn<>("Âge");
         iAge.setCellValueFactory(i -> new SimpleStringProperty(String.valueOf(i.getValue().getAge())));
-        TableColumn<User.Inscription,String> iCours = new TableColumn<>("Cours");
+        TableColumn<User.Inscription, String> iCours = new TableColumn<>("Cours");
         iCours.setCellValueFactory(i -> new SimpleStringProperty(i.getValue().getCours()));
-        TableColumn<User.Inscription,String> iHoraire = new TableColumn<>("Horaire");
+        TableColumn<User.Inscription, String> iHoraire = new TableColumn<>("Horaire");
         iHoraire.setCellValueFactory(i -> new SimpleStringProperty(i.getValue().getHoraireIso()));
         tableIns.getColumns().addAll(iNom, iAge, iCours, iHoraire);
         tableIns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
@@ -279,7 +303,10 @@ public class JavaFXApp extends Application {
                     return;
                 }
                 Creneau cible = tableCreneaux.getSelectionModel().getSelectedItem();
-                if (cible == null) { alerte("Sélection", "Choisis un créneau."); return; }
+                if (cible == null) {
+                    alerte("Sélection", "Choisis un créneau.");
+                    return;
+                }
                 int age = Integer.parseInt(champAge.getText().trim());
                 var ins = facade.inscrireEnfantDans(cible, champNomEnfant.getText().trim(), age);
                 zoneLogs.appendText("[OK] Inscription de " + ins.getNomEnfant() + " sur " + ins.getCours() + "\n");
@@ -309,9 +336,12 @@ public class JavaFXApp extends Application {
     private Tab tabCreneaux() {
         Tab tab = new Tab("Créneaux");
 
-        TextField champNomCours = new TextField(); champNomCours.setPromptText("Nom du cours");
-        TextField champDateISO = new TextField(); champDateISO.setPromptText("Date/heure ISO ex: 2025-10-10T14:30");
-        TextField champCapacite = new TextField(); champCapacite.setPromptText("Capacité");
+        TextField champNomCours = new TextField();
+        champNomCours.setPromptText("Nom du cours");
+        TextField champDateISO = new TextField();
+        champDateISO.setPromptText("Date/heure ISO ex: 2025-10-10T14:30");
+        TextField champCapacite = new TextField();
+        champCapacite.setPromptText("Capacité");
 
         Button btnCreer = new Button("Créer créneau");
         btnCreer.setOnAction(e -> {
@@ -332,8 +362,10 @@ public class JavaFXApp extends Application {
             }
         });
 
-        TextField champNomEleve = new TextField(); champNomEleve.setPromptText("Nom élève");
-        TextField champAge = new TextField(); champAge.setPromptText("Âge");
+        TextField champNomEleve = new TextField();
+        champNomEleve.setPromptText("Nom élève");
+        TextField champAge = new TextField();
+        champAge.setPromptText("Âge");
         Button btnAffecter = new Button("Affecter élève");
         btnAffecter.setOnAction(e -> {
             try {
@@ -371,9 +403,15 @@ public class JavaFXApp extends Application {
         Button btnFermer = new Button("Fermer inscriptions");
         btnFermer.setOnAction(e -> {
             Creneau sel = table.getSelectionModel().getSelectedItem();
-            if (sel == null) { alerte("Sélection", "Choisis un créneau."); return; }
+            if (sel == null) {
+                alerte("Sélection", "Choisis un créneau.");
+                return;
+            }
             try {
-                if (!facade.getSession().estGestionnaire()) { alerte("Droits insuffisants", "Réservé au gestionnaire."); return; }
+                if (!facade.getSession().estGestionnaire()) {
+                    alerte("Droits insuffisants", "Réservé au gestionnaire.");
+                    return;
+                }
                 facade.fermerInscriptions(sel);
                 rafraichirCreneaux();
                 zoneLogs.appendText("[INFO] Inscriptions fermées\n");
@@ -385,9 +423,15 @@ public class JavaFXApp extends Application {
         Button btnOuvrir = new Button("Ouvrir inscriptions");
         btnOuvrir.setOnAction(e -> {
             Creneau sel = table.getSelectionModel().getSelectedItem();
-            if (sel == null) { alerte("Sélection", "Choisis un créneau."); return; }
+            if (sel == null) {
+                alerte("Sélection", "Choisis un créneau.");
+                return;
+            }
             try {
-                if (!facade.getSession().estGestionnaire()) { alerte("Droits insuffisants", "Réservé au gestionnaire."); return; }
+                if (!facade.getSession().estGestionnaire()) {
+                    alerte("Droits insuffisants", "Réservé au gestionnaire.");
+                    return;
+                }
                 facade.ouvrirInscriptions(sel);
                 rafraichirCreneaux();
                 zoneLogs.appendText("[INFO] Inscriptions ouvertes\n");
@@ -432,12 +476,17 @@ public class JavaFXApp extends Application {
         rbPlusieurs.setToggleGroup(grp);
         rbUneFois.setSelected(true);
 
-        TextField champMontant = new TextField(); champMontant.setPromptText("Montant €");
-        TextField champNb = new TextField(); champNb.setPromptText("Nb versements (2..6)");
-        TextField champFrais = new TextField(); champFrais.setPromptText("Frais par échéance €");
+        TextField champMontant = new TextField();
+        champMontant.setPromptText("Montant €");
+        TextField champNb = new TextField();
+        champNb.setPromptText("Nb versements (2..6)");
+        TextField champFrais = new TextField();
+        champFrais.setPromptText("Frais par échéance €");
 
         Button btnCalculer = new Button("Calculer plan");
-        TextArea sortie = new TextArea(); sortie.setEditable(false); sortie.setPrefRowCount(10);
+        TextArea sortie = new TextArea();
+        sortie.setEditable(false);
+        sortie.setPrefRowCount(10);
 
         btnCalculer.setOnAction(e -> {
             try {

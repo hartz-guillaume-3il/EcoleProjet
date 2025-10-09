@@ -1,10 +1,13 @@
 package strategy.affectation;
 
 import state.Creneau;
+
 import java.util.Comparator;
 import java.util.List;
 
-/** Priorise le créneau avec le plus de places restantes, puis plus proche dans le temps. */
+/**
+ * Priorise le créneau avec le plus de places restantes, puis plus proche dans le temps.
+ */
 public final class AffectationParDisponibilite implements StrategieAffectation {
     @Override
     public Creneau choisir(Candidat c, List<Creneau> cs) {
@@ -17,5 +20,9 @@ public final class AffectationParDisponibilite implements StrategieAffectation {
                 .findFirst()
                 .orElse(null);
     }
-    @Override public String nom() { return "Disponibilités maximales"; }
+
+    @Override
+    public String nom() {
+        return "Disponibilités maximales";
+    }
 }

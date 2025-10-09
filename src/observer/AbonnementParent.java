@@ -2,11 +2,15 @@ package observer;
 
 import User.Parent;
 
-/** Adaptateur : un Parent devient Observateur. */
+/**
+ * Adaptateur : un Parent devient Observateur.
+ */
 public final class AbonnementParent implements Observateur {
     private final Parent parent;
 
-    public AbonnementParent(Parent parent) { this.parent = parent; }
+    public AbonnementParent(Parent parent) {
+        this.parent = parent;
+    }
 
     @Override
     public void mettreAJour(Notification n) {
