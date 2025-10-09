@@ -41,8 +41,9 @@ public class JavaFXApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        facade.initFichierUtilisateurs("data/utilisateurs.txt");
-        facade.initFichierInscriptions("data/inscriptions.txt");
+        facade.initFichierUtilisateurs("EcoleProjet/src/data/utilisateurs.txt");
+        facade.initFichierInscriptions("EcoleProjet/src/data/inscriptions.txt");
+        facade.initFichierSeance("EcoleProjet/src/data/seance.txt");
 
         if (!dialogueConnexion()) {
             stage.close();

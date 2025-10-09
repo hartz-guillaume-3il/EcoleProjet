@@ -17,6 +17,7 @@ import strategy.paiement.*;
 
 public final class GestionCoursFacade {
     private final GestionnaireUtilisateurs gestionnaireUtilisateurs = GestionnaireUtilisateurs.getInstance();
+    private FichierSeancesRepository repoSea;
     private final CentreNotifications notifications = CentreNotifications.getInstance();
     private final List<Creneau> creneaux = new ArrayList<>();
     private final Session session = new Session();
@@ -27,11 +28,20 @@ public final class GestionCoursFacade {
     private StrategieAffectation strategieAffectation = new AffectationParDisponibilite();
 
     public void initFichierUtilisateurs(String chemin) {
-        gestionnaireUtilisateurs.initialiserFichier("src/data/utilisateurs.txt");
+        gestionnaireUtilisateurs.initialiserFichier("EcoleProjet/src/data/utilisateurs.txt");
+    }
+
+    public void initFichierSeance(String chemin) {
+        repoSea = new FichierSeancesRepository("EcoleProjet/src/data/seance.txt");
+        try {
+            creneaux.addAll(repoSea.charger());
+        } catch (IOException ignored) {
+
+        }
     }
 
     public void initFichierInscriptions(String chemin) {
-        repoIns = new FichierInscriptionsRepository("src/data/inscriptions.txt");
+        repoIns = new FichierInscriptionsRepository("EcoleProjet/src/data/inscriptions.txt");
         try {
             inscriptions.addAll(repoIns.charger());
         } catch (IOException ignored) {

@@ -1,0 +1,21 @@
+Mathématiques 6e;2025-10-10T17:00;8
+Mathématiques 3e;2025-10-11T10:00;10
+Mathématiques 2nde;2025-10-11T14:00;12
+Français 6e;2025-10-12T09:30;8
+Français 3e;2025-10-12T11:30;10
+Physique 2nde;2025-10-12T15:00;12
+Physique 1re;2025-10-13T17:30;10
+Chimie 2nde;2025-10-13T18:30;10
+SVT 3e;2025-10-14T17:00;8
+Anglais A2;2025-10-14T18:00;12
+Anglais B1;2025-10-15T17:30;12
+Histoire 4e;2025-10-15T18:30;10
+Géographie 4e;2025-10-16T17:00;10
+Informatique Algo débutant;2025-10-16T18:00;14
+Informatique Python base;2025-10-17T17:30;14
+Philo Terminale;2025-10-18T09:00;8
+SES 1re;2025-10-18T11:00;10
+Espagnol A2;2025-10-18T14:00;12
+Allemand A1;2025-10-19T10:00;10
+Prépa Brevet—Révisions;2025-10-19T14:00;20
+Prépa Bac—Méthodologie;2025-10-19T16:30;18
