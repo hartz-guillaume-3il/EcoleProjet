@@ -1,9 +1,12 @@
 package decorator;
 
 import observer.Notification;
+
 import java.time.Instant;
 
-/** Ajoute un log horodaté avant chaque envoi. */
+/**
+ * Ajoute un log horodaté avant chaque envoi.
+ */
 public final class NotificationLogger extends NotificationDecorator {
     public NotificationLogger(NotificationService service) {
         super(service);
