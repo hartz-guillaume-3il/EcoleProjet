@@ -148,7 +148,7 @@ public class JavaFXApp extends Application {
             champRole.getSelectionModel().select("GESTIONNAIRE");
         } else {
             champRole.getSelectionModel().select("PARENT");
-            champRole.setDisable(true);
+            //champRole.setDisable(true);
         }
         TextField email = new TextField();
         email.setPromptText("email");
