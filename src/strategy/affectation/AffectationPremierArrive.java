@@ -4,12 +4,17 @@ import state.Creneau;
 
 import java.util.List;
 
-
+/**
+ * Attribue le premier créneau disponible trouvé.
+ */
 public final class AffectationPremierArrive implements StrategieAffectation {
+
     @Override
     public Creneau choisir(Candidat c, List<Creneau> cs) {
         for (Creneau cr : cs) {
-            if (cr.getInscrits() < cr.getCapaciteMax()) return cr;
+            if (cr.getNbInscrits() < cr.getCapaciteMax()) {
+                return cr;
+            }
         }
         return null;
     }

@@ -22,7 +22,7 @@ public final class EtatDisponible implements EtatCreneau {
         if (c.getNbInscrits() > 0) {
             c.decrementerInscrits();
             System.out.println("Une inscription a été annulée. (" + c.getNbInscrits() + "/" + c.getCapaciteMax() + ")");
-            if (c.getEtat() instanceof EtatComplet && c.getNbInscrits() < c.getCapaciteMax()) {
+            if (c.getEtatObjet() instanceof EtatComplet) {
                 c.changerEtat(new EtatDisponible());
             }
         } else {
