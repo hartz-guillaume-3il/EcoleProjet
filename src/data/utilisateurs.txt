@@ -1,3 +1,4 @@
 admin@mail.com;5f4dcc3b5aa765d61d8327deb882cf99;Martin;;GESTIONNAIREhartzg@3il.fr;5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5;Hartz;;PARENT
 pouchc@3il.fr;5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5;Pouch;;GESTIONNAIRE
 petitm@3il.fr;5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5;Petit;Melvyn;PARENT
+parent@test.fr;e47125968b3b71049fbc4802d1e40a71ea1359decfabacf70b34588037d4ff0c;test;test;PARENT

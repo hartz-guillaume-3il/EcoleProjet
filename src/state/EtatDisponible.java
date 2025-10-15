@@ -1,15 +1,33 @@
 package state;
 
 public final class EtatDisponible implements EtatCreneau {
+
     @Override
     public void reserver(Creneau c) {
-        c.incrementerInscrits();
-        System.out.println("Inscription réussie. (" + c.getInscrits() + "/" + c.getCapaciteMax() + ")");
+        if (c.getNbInscrits() < c.getCapaciteMax()) {
+            c.incrementerInscrits();
+            System.out.println("Inscription réussie. (" + c.getNbInscrits() + "/" + c.getCapaciteMax() + ")");
+            if (c.getNbInscrits() >= c.getCapaciteMax()) {
+                c.changerEtat(new EtatComplet());
+                System.out.println("Le créneau est maintenant complet.");
+            }
+        } else {
+            c.changerEtat(new EtatComplet());
+            System.out.println("Impossible d’inscrire : créneau complet.");
+        }
     }
 
     @Override
     public void annuler(Creneau c) {
-        System.out.println("Aucune annulation à effectuer.");
+        if (c.getNbInscrits() > 0) {
+            c.decrementerInscrits();
+            System.out.println("Une inscription a été annulée. (" + c.getNbInscrits() + "/" + c.getCapaciteMax() + ")");
+            if (c.getEtat() instanceof EtatComplet && c.getNbInscrits() < c.getCapaciteMax()) {
+                c.changerEtat(new EtatDisponible());
+            }
+        } else {
+            System.out.println("Aucune inscription à annuler.");
+        }
     }
 
     @Override

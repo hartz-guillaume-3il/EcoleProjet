@@ -27,6 +27,8 @@ public final class GestionCoursFacade {
     private CalculPaiement strategiePaiement = new PaiementUneFois();
     private StrategieAffectation strategieAffectation = new AffectationParDisponibilite();
 
+    // ---------- Initialisation ----------
+
     public void initFichierUtilisateurs(String chemin) {
         gestionnaireUtilisateurs.initialiserFichier("EcoleProjet/src/data/utilisateurs.txt");
     }
@@ -35,8 +37,8 @@ public final class GestionCoursFacade {
         repoSea = new FichierSeancesRepository("EcoleProjet/src/data/seance.txt");
         try {
             creneaux.addAll(repoSea.charger());
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+            System.err.println("Erreur lors du chargement des séances : " + e.getMessage());
         }
     }
 
@@ -44,10 +46,12 @@ public final class GestionCoursFacade {
         repoIns = new FichierInscriptionsRepository("EcoleProjet/src/data/inscriptions.txt");
         try {
             inscriptions.addAll(repoIns.charger());
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+            System.err.println("Erreur lors du chargement des inscriptions : " + e.getMessage());
         }
     }
+
+    // ---------- Authentification ----------
 
     public Optional<Utilisateur> connecter(String email, String motDePasse, Role roleAttendu) {
         Optional<Utilisateur> opt = gestionnaireUtilisateurs.authentifier(email, motDePasse);
@@ -58,22 +62,6 @@ public final class GestionCoursFacade {
         return Optional.empty();
     }
 
-    public Inscription inscrireEnfantDans(Creneau c, String nomEnfant, int age) {
-        if (!session.estParent()) throw new SecurityException("Réservé au parent");
-        c.reserver();
-        Inscription i = new Inscription(nomEnfant, age, c);
-        inscriptions.add(i);
-        try {
-            if (repoIns != null) repoIns.append(i);
-        } catch (IOException ignored) {
-        }
-        return i;
-    }
-
-    public List<Inscription> listerInscriptions() {
-        return List.copyOf(inscriptions);
-    }
-
     public void deconnecter() {
         session.fermer();
     }
@@ -82,64 +70,13 @@ public final class GestionCoursFacade {
         return session;
     }
 
+    // ---------- Gestion des utilisateurs ----------
+
     public Utilisateur inscrireUtilisateur(Role role, Map<String, String> infos) {
         if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
         Utilisateur u = UtilisateurFactory.creerUtilisateur(role, infos);
         gestionnaireUtilisateurs.enregistrer(u);
         return u;
-    }
-
-    public Creneau creerCreneau(String nomCours, LocalDateTime horaire, int capacite) {
-        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
-        Creneau c = new Creneau(nomCours, horaire, capacite);
-        creneaux.add(c);
-        return c;
-    }
-
-    public void fermerInscriptions(Creneau c) {
-        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
-        c.changerEtat(new EtatFerme());
-    }
-
-    public void ouvrirInscriptions(Creneau c) {
-        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
-        c.changerEtat(new EtatDisponible());
-    }
-
-    public Optional<Creneau> affecterEleve(String nomEleve, int age) {
-        if (!session.estParent()) throw new SecurityException("Réservé au parent");
-        Candidat c = new Candidat(nomEleve, age, System.nanoTime());
-        Creneau choix = strategieAffectation.choisir(c, creneaux);
-        if (choix != null) {
-            choix.reserver();
-            return Optional.of(choix);
-        }
-        notifications.notifierTous(new Notification(TypeEvenement.CRENEAU_ANNULE, "Aucun créneau disponible", Map.of("eleve", nomEleve)));
-        return Optional.empty();
-    }
-
-    public PlanPaiement calculerPaiement(BigDecimal montant) {
-        return strategiePaiement.calculer(montant);
-    }
-
-    public void changerStrategiePaiement(CalculPaiement s) {
-        this.strategiePaiement = s;
-    }
-
-    public void changerStrategieAffectation(StrategieAffectation s) {
-        this.strategieAffectation = s;
-    }
-
-    public List<Creneau> listerCreneaux() {
-        return List.copyOf(creneaux);
-    }
-
-    public List<Utilisateur> listerUtilisateurs() {
-        return gestionnaireUtilisateurs.listerTous();
-    }
-
-    public boolean utilisateursVides() {
-        return gestionnaireUtilisateurs.estVide();
     }
 
     public Utilisateur autoInscriptionParent(Map<String, String> infos) {
@@ -161,5 +98,108 @@ public final class GestionCoursFacade {
 
     public boolean existeGestionnaire() {
         return gestionnaireUtilisateurs.existeGestionnaire();
+    }
+
+    // ---------- Gestion des créneaux ----------
+
+    public Creneau creerCreneau(String nomCours, LocalDateTime horaire, int capacite) {
+        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
+        Creneau c = new Creneau(nomCours, horaire, capacite);
+        creneaux.add(c);
+        try {
+            if (repoSea != null) repoSea.append(c);
+        } catch (IOException e) {
+            System.err.println("Erreur lors de l’écriture d’un créneau : " + e.getMessage());
+        }
+        return c;
+    }
+
+    public void fermerInscriptions(Creneau c) {
+        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
+        c.setEtat("Fermé");
+        sauvegarderSeances();
+    }
+
+    public void ouvrirInscriptions(Creneau c) {
+        if (!session.estGestionnaire()) throw new SecurityException("Réservé au gestionnaire");
+        c.setEtat("Disponible");
+        sauvegarderSeances();
+    }
+
+    public List<Creneau> listerCreneaux() {
+        return List.copyOf(creneaux);
+    }
+
+    // ---------- Inscriptions ----------
+
+    public Inscription inscrireEnfantDans(Creneau c, String nomEnfant, int age) {
+        if (!session.estParent()) throw new SecurityException("Réservé au parent");
+        c.setNbInscrits(c.getNbInscrits() + 1);
+        Inscription i = new Inscription(nomEnfant, age, c);
+        inscriptions.add(i);
+
+        try {
+            if (repoIns != null) repoIns.append(i);
+            if (repoSea != null) repoSea.ecrireTous(creneaux); // mettre à jour le nbInscrits
+        } catch (IOException e) {
+            System.err.println("Erreur lors de l’inscription : " + e.getMessage());
+        }
+
+        return i;
+    }
+
+    public List<Inscription> listerInscriptions() {
+        return List.copyOf(inscriptions);
+    }
+
+    private void sauvegarderSeances() {
+        try {
+            if (repoSea != null) repoSea.ecrireTous(creneaux);
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la sauvegarde des séances : " + e.getMessage());
+        }
+    }
+
+    // ---------- Affectation ----------
+
+    public Optional<Creneau> affecterEleve(String nomEleve, int age) {
+        if (!session.estParent()) throw new SecurityException("Réservé au parent");
+        Candidat c = new Candidat(nomEleve, age, System.nanoTime());
+        Creneau choix = strategieAffectation.choisir(c, creneaux);
+        if (choix != null) {
+            choix.setNbInscrits(choix.getNbInscrits() + 1);
+            sauvegarderSeances();
+            return Optional.of(choix);
+        }
+        notifications.notifierTous(new Notification(
+                TypeEvenement.CRENEAU_ANNULE,
+                "Aucun créneau disponible",
+                Map.of("eleve", nomEleve)
+        ));
+        return Optional.empty();
+    }
+
+    // ---------- Paiement ----------
+
+    public PlanPaiement calculerPaiement(BigDecimal montant) {
+        return strategiePaiement.calculer(montant);
+    }
+
+    public void changerStrategiePaiement(CalculPaiement s) {
+        this.strategiePaiement = s;
+    }
+
+    public void changerStrategieAffectation(StrategieAffectation s) {
+        this.strategieAffectation = s;
+    }
+
+    // ---------- Consultation ----------
+
+    public List<Utilisateur> listerUtilisateurs() {
+        return gestionnaireUtilisateurs.listerTous();
+    }
+
+    public boolean utilisateursVides() {
+        return gestionnaireUtilisateurs.estVide();
     }
 }

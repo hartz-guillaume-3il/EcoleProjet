@@ -23,6 +23,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -130,7 +131,10 @@ public class JavaFXApp extends Application {
 
         tabs.getTabs().add(tabCreneaux());
         if (isGest) tabs.getTabs().add(tabUtilisateurs());
-        if (isParent) tabs.getTabs().add(tabInscriptions());
+        if (isParent) {
+            tabs.getTabs().add(tabInscriptions());
+            tabs.getTabs().add(tabPaiements());
+        }
 
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         return tabs;
@@ -482,9 +486,10 @@ public class JavaFXApp extends Application {
         TextField champNb = new TextField();
         champNb.setPromptText("Nb versements (2..6)");
         TextField champFrais = new TextField();
-        champFrais.setPromptText("Frais par échéance €");
+        champFrais.isDisabled();
+        champFrais.setPromptText("Taux d'intérêt paiement en plusieurs fois");
 
-        Button btnCalculer = new Button("Calculer plan");
+        Button btnCalculer = new Button("Calculer le plan");
         TextArea sortie = new TextArea();
         sortie.setEditable(false);
         sortie.setPrefRowCount(10);
@@ -492,19 +497,35 @@ public class JavaFXApp extends Application {
         btnCalculer.setOnAction(e -> {
             try {
                 BigDecimal montant = new BigDecimal(champMontant.getText().trim());
+
                 if (rbUneFois.isSelected()) {
-                    // Stratégie une fois
+                    // Paiement en une seule fois
                     facade.changerStrategiePaiement(new PaiementUneFois());
                 } else {
                     int n = Integer.parseInt(champNb.getText().trim());
-                    BigDecimal frais = new BigDecimal(champFrais.getText().trim());
-                    facade.changerStrategiePaiement(new PaiementPlusieursVersements(n, frais));
+                    if (n < 2 || n > 6)
+                        throw new IllegalArgumentException("Nb de versements entre 2 et 6");
+
+                    // Calcul automatique : 5 % du montant total réparti sur chaque échéance
+                    BigDecimal fraisTotal = montant.multiply(BigDecimal.valueOf(0.05));
+                    BigDecimal taux = BigDecimal.valueOf(0.05);
+
+                    // Afficher automatiquement la valeur dans le champ
+                    champFrais.setText(taux.toPlainString());
+
+                    // Utiliser la nouvelle version du calcul
+                    facade.changerStrategiePaiement(new PaiementPlusieursVersements(n, taux));
                 }
+
                 var plan = facade.calculerPaiement(montant);
+
                 StringBuilder sb = new StringBuilder();
-                plan.echeances().forEach(ech -> sb.append(ech.date()).append(" : ").append(ech.montant()).append("€\n"));
+                plan.echeances().forEach(ech -> sb.append(ech.date())
+                        .append(" : ").append(ech.montant()).append("€\n"));
                 sb.append("Total : ").append(plan.total()).append("€");
+
                 sortie.setText(sb.toString());
+
             } catch (Exception ex) {
                 alerte("Erreur de calcul", ex.getMessage());
             }

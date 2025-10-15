@@ -8,7 +8,7 @@ public final class EtatComplet implements EtatCreneau {
 
     @Override
     public void annuler(Creneau c) {
-        c.decrementerInscrits();
+        c.setNbInscrits();
         System.out.println("Annulation enregistrée.");
     }
 
