@@ -281,9 +281,9 @@ public class JavaFXApp extends Application {
         TableColumn<Creneau, String> cHoraire = new TableColumn<>("Horaire");
         cHoraire.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getHoraire().toString()));
         TableColumn<Creneau, String> cPlaces = new TableColumn<>("Places");
-        cPlaces.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInscrits() + "/" + c.getValue().getCapaciteMax()));
+        cPlaces.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNbInscrits() + "/" + c.getValue().getCapaciteMax()));
         TableColumn<Creneau, String> cEtat = new TableColumn<>("État");
-        cEtat.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEtat().getNomEtat()));
+        cEtat.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEtat()));
         tableCreneaux.getColumns().addAll(cCours, cHoraire, cPlaces, cEtat);
         tableCreneaux.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
         tableCreneaux.setPrefHeight(220);
@@ -398,9 +398,9 @@ public class JavaFXApp extends Application {
         TableColumn<Creneau, String> colCap = new TableColumn<>("Capacité");
         colCap.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().getCapaciteMax())));
         TableColumn<Creneau, String> colInscrits = new TableColumn<>("Inscrits");
-        colInscrits.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().getInscrits())));
+        colInscrits.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().getNbInscrits())));
         TableColumn<Creneau, String> colEtat = new TableColumn<>("État");
-        colEtat.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEtat().getNomEtat()));
+        colEtat.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEtat()));
         table.getColumns().addAll(colCours, colHoraire, colCap, colInscrits, colEtat);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
