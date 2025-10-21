@@ -8,7 +8,7 @@ IA;2025-10-22T13:45;45;5;Disponible
 Signal;2025-10-22T16:00;120;20;Disponible
 Projet Corell;2025-10-23T08:30;60;0;Disponible
 FortiGate;2025-10-23T10:00;90;15;Disponible
-TP Hyper-V;2025-10-23T13:00;180;0;Disponible
+TP Hyper-V;2025-10-23T13:00;180;1;Disponible
 Revue PSSI;2025-10-23T17:00;60;10;Disponible
 Docker/Traefik;2025-10-24T09:00;120;15;Disponible
 Reverse Proxy;2025-10-24T11:30;60;10;Disponible
@@ -25,7 +25,7 @@ RGPD/Article30;2025-10-27T09:00;120;20;Disponible
 DPIA;2025-10-27T11:30;90;10;Disponible
 FortiGate Policies;2025-10-27T14:00;120;15;Disponible
 Traffic Shaping;2025-10-27T16:30;60;5;Disponible
-Hyper-V Réseau;2025-10-28T09:00;180;0;Disponible
+Hyper-V Réseau;2025-10-28T09:00;180;1;Disponible
 VLAN/L3;2025-10-28T13:00;120;15;Disponible
 AD-DS/DFS;2025-10-28T16:00;90;10;Disponible
 Sauvegardes;2025-10-29T09:00;120;10;Disponible
@@ -58,7 +58,7 @@ Java Patterns;2025-11-04T12:00;90;10;Disponible
 Refactor UI;2025-11-04T14:00;120;15;Disponible
 Mermaid Schémas;2025-11-05T09:00;60;5;Disponible
 Schéma Réseau;2025-11-05T10:15;90;10;Disponible
-FortiGate VIP;2025-11-05T12:00;60;5;Fermé
+FortiGate VIP;2025-11-05T12:00;60;6;Fermé
 URL Filtering;2025-11-05T14:00;75;10;Disponible
 Ansible Init;2025-11-06T09:00;120;15;Disponible
 Docker Compose;2025-11-06T11:30;90;10;Disponible
