@@ -1,66 +1,66 @@
 Informatique;2025-10-21T09:00;60;0;Disponible
-Réseau;2025-10-21T11:00;90;15;Occupé
-Cybersécurité;2025-10-21T14:00;120;30;Confirmé
+Réseau;2025-10-21T11:00;90;15;Disponible
+Cybersécurité;2025-10-21T14:00;120;30;Disponible
 Dév Web;2025-10-21T17:15;75;0;Disponible
-Java;2025-10-22T09:30;60;10;Occupé
-Langage C;2025-10-22T11:15;90;0;Confirmé
-IA;2025-10-22T13:45;45;5;Tentatif
-Signal;2025-10-22T16:00;120;20;Occupé
+Java;2025-10-22T09:30;60;10;Disponible
+Langage C;2025-10-22T11:15;90;0;Disponible
+IA;2025-10-22T13:45;45;5;Disponible
+Signal;2025-10-22T16:00;120;20;Disponible
 Projet Corell;2025-10-23T08:30;60;0;Disponible
-FortiGate;2025-10-23T10:00;90;15;Confirmé
-TP Hyper-V;2025-10-23T13:00;180;0;Occupé
+FortiGate;2025-10-23T10:00;90;15;Disponible
+TP Hyper-V;2025-10-23T13:00;180;0;Disponible
 Revue PSSI;2025-10-23T17:00;60;10;Disponible
-Docker/Traefik;2025-10-24T09:00;120;15;Confirmé
-Reverse Proxy;2025-10-24T11:30;60;10;Occupé
+Docker/Traefik;2025-10-24T09:00;120;15;Disponible
+Reverse Proxy;2025-10-24T11:30;60;10;Disponible
 Statistiques Python;2025-10-24T14:00;90;10;Disponible
-ANOVA/Tests;2025-10-24T16:00;75;10;Tentatif
+ANOVA/Tests;2025-10-24T16:00;75;10;Disponible
 Lua Scripting;2025-10-25T12:00;60;5;Disponible
-Design UI/UX;2025-10-25T15:00;90;10;Confirmé
+Design UI/UX;2025-10-25T15:00;90;10;Disponible
 Diagrammes Mermaid;2025-10-26T09:00;60;0;Disponible
-Matrice RACI;2025-10-26T10:15;75;10;Confirmé
+Matrice RACI;2025-10-26T10:15;75;10;Disponible
 Gantt;2025-10-26T12:00;60;5;Disponible
-PCI-DSS;2025-10-26T14:00;120;15;Occupé
-ISO 27001;2025-10-26T16:30;90;10;Confirmé
-RGPD/Article30;2025-10-27T09:00;120;20;Occupé
+PCI-DSS;2025-10-26T14:00;120;15;Disponible
+ISO 27001;2025-10-26T16:30;90;10;Disponible
+RGPD/Article30;2025-10-27T09:00;120;20;Disponible
 DPIA;2025-10-27T11:30;90;10;Disponible
-FortiGate Policies;2025-10-27T14:00;120;15;Confirmé
-Traffic Shaping;2025-10-27T16:30;60;5;Tentatif
-Hyper-V Réseau;2025-10-28T09:00;180;0;Occupé
-VLAN/L3;2025-10-28T13:00;120;15;Confirmé
+FortiGate Policies;2025-10-27T14:00;120;15;Disponible
+Traffic Shaping;2025-10-27T16:30;60;5;Disponible
+Hyper-V Réseau;2025-10-28T09:00;180;0;Disponible
+VLAN/L3;2025-10-28T13:00;120;15;Disponible
 AD-DS/DFS;2025-10-28T16:00;90;10;Disponible
-Sauvegardes;2025-10-29T09:00;120;10;Confirmé
-Plan PRA/PCA;2025-10-29T11:30;90;15;Occupé
+Sauvegardes;2025-10-29T09:00;120;10;Disponible
+Plan PRA/PCA;2025-10-29T11:30;90;15;Disponible
 Comptabilité Devoir;2025-10-29T14:00;75;5;Disponible
-Projet JavaFX;2025-10-29T16:00;120;15;Confirmé
+Projet JavaFX;2025-10-29T16:00;120;15;Disponible
 Observer/Strategy;2025-10-30T09:00;90;10;Disponible
-Paiement Échelonné;2025-10-30T11:00;60;5;Tentatif
-Séances Cours;2025-10-30T13:00;75;10;Confirmé
+Paiement Échelonné;2025-10-30T11:00;60;5;Disponible
+Séances Cours;2025-10-30T13:00;75;10;Disponible
 Persistence Fichiers;2025-10-30T15:00;60;10;Disponible
-Git/CI;2025-10-31T09:00;90;10;Confirmé
-Root-Me;2025-10-31T11:00;120;15;Occupé
+Git/CI;2025-10-31T09:00;90;10;Disponible
+Root-Me;2025-10-31T11:00;120;15;Disponible
 Kali Forensics;2025-10-31T14:00;90;10;Disponible
-CVE-2023-21036;2025-10-31T16:00;60;5;Tentatif
+CVE-2023-21036;2025-10-31T16:00;60;5;Disponible
 OPNsense/Alt;2025-11-01T09:00;120;15;Disponible
-SSH Hardening;2025-11-01T11:30;60;10;Confirmé
-TLS/PKI;2025-11-01T13:00;90;10;Occupé
+SSH Hardening;2025-11-01T11:30;60;10;Disponible
+TLS/PKI;2025-11-01T13:00;90;10;Disponible
 Monitoring;2025-11-01T15:00;75;10;Disponible
-ELK/Logs;2025-11-02T09:00;120;15;Confirmé
-Supervision;2025-11-02T11:30;90;10;Occupé
+ELK/Logs;2025-11-02T09:00;120;15;Disponible
+Supervision;2025-11-02T11:30;90;10;Disponible
 KPI/KRI;2025-11-02T14:00;75;10;Disponible
-Tableaux de bord;2025-11-02T16:00;60;5;Confirmé
-SLA/Backup;2025-11-03T09:00;120;15;Occupé
-Tests Restauration;2025-11-03T11:30;90;10;Confirmé
+Tableaux de bord;2025-11-02T16:00;60;5;Disponible
+SLA/Backup;2025-11-03T09:00;120;15;Disponible
+Tests Restauration;2025-11-03T11:30;90;10;Disponible
 MFA/SSO;2025-11-03T14:00;75;10;Disponible
-EDR/NDR;2025-11-03T16:00;90;10;Tentatif
+EDR/NDR;2025-11-03T16:00;90;10;Disponible
 Plan de Cours;2025-11-04T09:00;60;0;Disponible
-Inscription Élèves;2025-11-04T10:15;75;10;Confirmé
-Java Patterns;2025-11-04T12:00;90;10;Occupé
+Inscription Élèves;2025-11-04T10:15;75;10;Disponible
+Java Patterns;2025-11-04T12:00;90;10;Disponible
 Refactor UI;2025-11-04T14:00;120;15;Disponible
-Mermaid Schémas;2025-11-05T09:00;60;5;Confirmé
-Schéma Réseau;2025-11-05T10:15;90;10;Occupé
-FortiGate VIP;2025-11-05T12:00;60;5;Confirmé
+Mermaid Schémas;2025-11-05T09:00;60;5;Disponible
+Schéma Réseau;2025-11-05T10:15;90;10;Disponible
+FortiGate VIP;2025-11-05T12:00;60;5;Fermé
 URL Filtering;2025-11-05T14:00;75;10;Disponible
-Ansible Init;2025-11-06T09:00;120;15;Tentatif
-Docker Compose;2025-11-06T11:30;90;10;Confirmé
-CI/CD;2025-11-06T14:00;120;15;Occupé
+Ansible Init;2025-11-06T09:00;120;15;Disponible
+Docker Compose;2025-11-06T11:30;90;10;Disponible
+CI/CD;2025-11-06T14:00;120;15;Disponible
 Tests Unitaires;2025-11-06T16:30;60;5;Disponible
