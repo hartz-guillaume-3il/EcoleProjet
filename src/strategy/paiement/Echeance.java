@@ -1,4 +1,3 @@
-// src/main/java/strategy/paiement/Echeance.java
 package strategy.paiement;
 
 import java.math.BigDecimal;

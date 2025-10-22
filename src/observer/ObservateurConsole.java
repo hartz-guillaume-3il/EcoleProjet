@@ -1,8 +1,5 @@
 package observer;
 
-/**
- * Observateur simple pour les tests.
- */
 public final class ObservateurConsole implements Observateur {
     private final String nom;
 

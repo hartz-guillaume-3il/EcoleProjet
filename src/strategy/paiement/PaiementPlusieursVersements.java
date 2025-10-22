@@ -6,13 +6,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Paiement en plusieurs fois avec un intérêt appliqué (ex : 5 % annuel).
- * Jusqu’à 6 versements maximum.
- */
 public final class PaiementPlusieursVersements implements CalculPaiement {
     private final int nbVersements;
-    private final BigDecimal tauxAnnuel; // ex : 0.05 pour 5 %
+    private final BigDecimal tauxAnnuel;
 
     public PaiementPlusieursVersements(int nbVersements, BigDecimal tauxAnnuel) {
         if (nbVersements < 2 || nbVersements > 6)
@@ -27,7 +23,6 @@ public final class PaiementPlusieursVersements implements CalculPaiement {
         BigDecimal tauxMensuel = tauxAnnuel.divide(BigDecimal.valueOf(12), 6, RoundingMode.HALF_UP);
         BigDecimal montantTotal = prixCours;
 
-        // Intérêt total proportionnel au nombre de mois
         BigDecimal interet = prixCours.multiply(tauxMensuel).multiply(BigDecimal.valueOf(nbVersements));
         montantTotal = montantTotal.add(interet).setScale(2, RoundingMode.HALF_UP);
 
@@ -38,7 +33,6 @@ public final class PaiementPlusieursVersements implements CalculPaiement {
 
         for (int i = 0; i < nbVersements; i++) {
             BigDecimal montant = base;
-            // Ajustement sur la dernière pour corriger les arrondis
             if (i == nbVersements - 1) {
                 montant = montantTotal.subtract(base.multiply(BigDecimal.valueOf(nbVersements - 1)))
                         .setScale(2, RoundingMode.HALF_UP);

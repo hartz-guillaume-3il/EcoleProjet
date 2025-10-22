@@ -1,4 +1,3 @@
-// src/main/java/persistence/FichierSeancesRepository.java
 package persistence;
 
 import state.Creneau;

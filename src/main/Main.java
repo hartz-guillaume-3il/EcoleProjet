@@ -29,32 +29,22 @@ public class Main {
 
         System.out.println("=== DÉMONSTRATION DU SYSTÈME COMPLET ===\n");
 
-        // --- Décorateur : service de notification enrichi ---
         NotificationService base = new NotificationServiceBase();
         NotificationService serviceEmail = new NotificationEmail(new NotificationLogger(base));
 
-        // --- Observer : le centre des notifications diffuse aux observateurs ---
         CentreNotifications centre = CentreNotifications.getInstance();
         centre.abonner(new ObservateurConsole("Console"));
         centre.abonner(notification -> serviceEmail.envoyer(notification));
 
-        // --- Façade : point d’entrée global ---
         GestionCoursFacade facade = new GestionCoursFacade();
 
-        // --- Factory + Singleton : création et enregistrement d’utilisateurs ---
         System.out.println("\n--- Création des utilisateurs ---");
-        Utilisateur parent = facade.inscrireUtilisateur(Role.PARENT, Map.of(
-                "email", "alice@mail.com",
-                "motDePasse", "secret",
-                "nom", "Dupont",
-                "prenom", "Alice"
-        ));
-
         Utilisateur gestionnaire = facade.inscrireUtilisateur(Role.GESTIONNAIRE, Map.of(
                 "email", "admin@mail.com",
                 "motDePasse", "admin123",
                 "nom", "Martin"
         ));
+
 
         System.out.println("Utilisateurs enregistrés :");
         for (Utilisateur u : facade.listerUtilisateurs()) {
@@ -68,11 +58,11 @@ public class Main {
 
         facade.affecterEleve("Paul", 12);
         facade.affecterEleve("Emma", 14);
-        facade.affecterEleve("Lucas", 13); // devrait notifier complet
+        facade.affecterEleve("Lucas", 13);
 
-        c2.annuler(); // libère une place
+        c2.annuler();
         c2.changerEtat(new EtatFerme());
-        c2.reserver(); // devrait être refusé
+        c2.reserver();
 
         // --- Strategy : paiements multiples ---
         System.out.println("\n--- Calcul de paiements (Strategy) ---");

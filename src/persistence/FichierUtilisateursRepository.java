@@ -7,10 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
-/**
- * Persistance des utilisateurs dans un fichier texte.
- * Format par ligne : email;hash;nom;prenom;role
- */
 public final class FichierUtilisateursRepository {
     private final Path path;
 
@@ -18,9 +14,6 @@ public final class FichierUtilisateursRepository {
         this.path = Paths.get(cheminFichier);
     }
 
-    /**
-     * Lecture complète du fichier → liste d'utilisateurs.
-     */
     public List<Utilisateur> charger() throws IOException {
         if (Files.notExists(path)) return List.of();
         List<Utilisateur> out = new ArrayList<>();
@@ -39,16 +32,15 @@ public final class FichierUtilisateursRepository {
                 switch (role) {
                     case "PARENT" -> out.add(new Parent(email, hash, nom, prenom, true));
                     case "GESTIONNAIRE" -> out.add(new Gestionnaire(email, hash, nom, true));
-                    default -> { /* ignore ligne invalide */ }
+                    default -> {
+
+                    }
                 }
             }
         }
         return out;
     }
 
-    /**
-     * Ajoute un utilisateur en fin de fichier.
-     */
     public synchronized void append(Utilisateur u) throws IOException {
         Files.createDirectories(path.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8,
@@ -65,9 +57,6 @@ public final class FichierUtilisateursRepository {
         }
     }
 
-    /**
-     * Réécrit l'intégralité du fichier à partir d'une collection.
-     */
     public synchronized void ecrireTous(Collection<Utilisateur> users) throws IOException {
         Files.createDirectories(path.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8,
@@ -86,9 +75,6 @@ public final class FichierUtilisateursRepository {
         }
     }
 
-    /**
-     * Chemin du fichier pour debug/tests.
-     */
     public Path getPath() {
         return path;
     }

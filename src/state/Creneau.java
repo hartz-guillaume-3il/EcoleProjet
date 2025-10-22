@@ -9,8 +9,6 @@ public class Creneau {
     private int nbInscrits;
     private EtatCreneau etat;
 
-    // ---------- Constructeurs ----------
-
     public Creneau(String nomCours, LocalDateTime horaire, int capaciteMax) {
         this(nomCours, horaire, capaciteMax, 0, "Disponible");
     }
@@ -23,15 +21,11 @@ public class Creneau {
         this.etat = creerEtatDepuisNom(nomEtat);
     }
 
-    // ---------- Accesseurs ----------
-
     public String getNomCours() { return nomCours; }
     public LocalDateTime getHoraire() { return horaire; }
     public int getCapaciteMax() { return capaciteMax; }
     public int getNbInscrits() { return nbInscrits; }
     public String getEtat() { return etat.getNomEtat(); }
-
-    // ---------- Méthodes de gestion ----------
 
     public void reserver() {
         etat.reserver(this);
@@ -67,8 +61,6 @@ public class Creneau {
     public void setEtat(String nomEtat) {
         this.etat = creerEtatDepuisNom(nomEtat);
     }
-
-    // ---------- Méthode utilitaire ----------
 
     private EtatCreneau creerEtatDepuisNom(String nomEtat) {
         return switch (nomEtat.toLowerCase()) {

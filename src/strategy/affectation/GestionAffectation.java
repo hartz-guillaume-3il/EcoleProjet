@@ -4,9 +4,6 @@ import state.Creneau;
 
 import java.util.List;
 
-/**
- * Contexte: sélectionne une stratégie d’affectation.
- */
 public final class GestionAffectation {
     private StrategieAffectation strategie;
 

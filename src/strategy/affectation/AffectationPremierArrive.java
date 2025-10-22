@@ -4,9 +4,6 @@ import state.Creneau;
 
 import java.util.List;
 
-/**
- * Attribue le premier créneau disponible trouvé.
- */
 public final class AffectationPremierArrive implements StrategieAffectation {
 
     @Override

@@ -5,9 +5,6 @@ import state.Creneau;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Priorise le créneau avec le plus de places restantes, puis le plus proche dans le temps.
- */
 public final class AffectationParDisponibilite implements StrategieAffectation {
 
     @Override

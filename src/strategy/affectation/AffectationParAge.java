@@ -5,10 +5,6 @@ import state.Creneau;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Exemple : favorise les créneaux “avancés” pour les plus âgés
- * (ici triés par capacité croissante, comme proxy de difficulté).
- */
 public final class AffectationParAge implements StrategieAffectation {
 
     @Override

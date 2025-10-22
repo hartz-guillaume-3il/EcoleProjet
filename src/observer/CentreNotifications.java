@@ -3,9 +3,6 @@ package observer;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Sujet centralisé (Singleton) pour diffuser les notifications.
- */
 public final class CentreNotifications implements Sujet {
     private static final CentreNotifications INSTANCE = new CentreNotifications();
 

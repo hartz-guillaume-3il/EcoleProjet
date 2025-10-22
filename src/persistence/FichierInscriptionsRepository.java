@@ -8,10 +8,6 @@ import java.nio.file.*;
 import java.time.Instant;
 import java.util.*;
 
-/**
- * Persistance des inscriptions dans un fichier texte.
- * Format par ligne : enfant;age;cours;horaireISO;horodatageISO
- */
 public final class FichierInscriptionsRepository {
     private final Path path;
 
@@ -19,16 +15,13 @@ public final class FichierInscriptionsRepository {
         this.path = Paths.get(cheminFichier);
     }
 
-    /**
-     * Lecture complète du fichier → liste d'inscriptions.
-     */
     public List<Inscription> charger() throws IOException {
         if (Files.notExists(path)) return List.of();
         List<Inscription> out = new ArrayList<>();
         try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             for (String l; (l = br.readLine()) != null; ) {
                 if (l.isBlank()) continue;
-                String[] t = l.split(";", -1); // enfant;age;cours;horaireISO;ts
+                String[] t = l.split(";", -1);
                 if (t.length < 5) continue;
                 String enfant = t[0];
                 int age;
@@ -52,9 +45,6 @@ public final class FichierInscriptionsRepository {
         return out;
     }
 
-    /**
-     * Ajoute une inscription en fin de fichier.
-     */
     public synchronized void append(Inscription i) throws IOException {
         Files.createDirectories(path.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8,
@@ -64,9 +54,6 @@ public final class FichierInscriptionsRepository {
         }
     }
 
-    /**
-     * Réécrit l'intégralité du fichier à partir d'une collection.
-     */
     public synchronized void ecrireTous(Collection<Inscription> ins) throws IOException {
         Files.createDirectories(path.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8,
