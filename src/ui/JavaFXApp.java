@@ -9,6 +9,7 @@ import observer.Notification;
 import observer.ObservateurConsole;
 import state.Creneau;
 import strategy.affectation.AffectationParDisponibilite;
+import strategy.paiement.Echeance;
 import strategy.paiement.PaiementPlusieursVersements;
 import strategy.paiement.PaiementUneFois;
 
@@ -27,6 +28,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -486,8 +488,7 @@ public class JavaFXApp extends Application {
         TextField champNb = new TextField();
         champNb.setPromptText("Nb versements (2..6)");
         TextField champFrais = new TextField();
-        champFrais.isDisabled();
-        champFrais.setPromptText("Taux d'intérêt paiement en plusieurs fois");
+        champFrais.setPromptText("Taux d'intérêt ex: 0.05");
 
         Button btnCalculer = new Button("Calculer le plan");
         TextArea sortie = new TextArea();
@@ -499,30 +500,34 @@ public class JavaFXApp extends Application {
                 BigDecimal montant = new BigDecimal(champMontant.getText().trim());
 
                 if (rbUneFois.isSelected()) {
-                    // Paiement en une seule fois
                     facade.changerStrategiePaiement(new PaiementUneFois());
                 } else {
                     int n = Integer.parseInt(champNb.getText().trim());
                     if (n < 2 || n > 6)
                         throw new IllegalArgumentException("Nb de versements entre 2 et 6");
 
-                    // Calcul automatique : 5 % du montant total réparti sur chaque échéance
-                    BigDecimal fraisTotal = montant.multiply(BigDecimal.valueOf(0.05));
-                    BigDecimal taux = BigDecimal.valueOf(0.05);
+                    BigDecimal taux;
+                    if (champFrais.getText().isBlank()) {
+                        taux = new BigDecimal("0.05");
+                        champFrais.setText("0.05");
+                    } else {
+                        taux = new BigDecimal(champFrais.getText().trim());
+                    }
 
-                    // Afficher automatiquement la valeur dans le champ
-                    champFrais.setText(taux.toPlainString());
-
-                    // Utiliser la nouvelle version du calcul
                     facade.changerStrategiePaiement(new PaiementPlusieursVersements(n, taux));
                 }
 
                 var plan = facade.calculerPaiement(montant);
 
                 StringBuilder sb = new StringBuilder();
-                plan.echeances().forEach(ech -> sb.append(ech.date())
-                        .append(" : ").append(ech.montant()).append("€\n"));
-                sb.append("Total : ").append(plan.total()).append("€");
+                int index = 1;
+                for (var ech : plan.echeances()) {
+                    sb.append("Échéance ").append(index++)
+                            .append(" : ").append(ech.montant().setScale(2, RoundingMode.HALF_UP).toPlainString())
+                            .append(" €\n");
+                }
+                sb.append("Total : ").append(plan.total().setScale(2, RoundingMode.HALF_UP)).append(" € \n");
+                sb.append("Stratégie : ").append(facade.strategiePaiementActive());
 
                 sortie.setText(sb.toString());
 
@@ -531,7 +536,7 @@ public class JavaFXApp extends Application {
             }
         });
 
-        // Stratégie d’affectation par défaut
+        // Sélection par défaut
         facade.changerStrategieAffectation(new AffectationParDisponibilite());
 
         HBox ligne1 = new HBox(10, rbUneFois, rbPlusieurs, champNb, champFrais);

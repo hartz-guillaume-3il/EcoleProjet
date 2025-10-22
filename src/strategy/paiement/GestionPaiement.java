@@ -2,9 +2,7 @@ package strategy.paiement;
 
 import java.math.BigDecimal;
 
-/**
- * Contexte: utilise une stratégie sélectionnée au runtime.
- */
+
 public final class GestionPaiement {
     private CalculPaiement strategie;
 

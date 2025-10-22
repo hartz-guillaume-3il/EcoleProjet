@@ -24,7 +24,8 @@ public final class GestionCoursFacade {
     private final List<Inscription> inscriptions = new ArrayList<>();
     private FichierInscriptionsRepository repoIns;
 
-    private CalculPaiement strategiePaiement = new PaiementUneFois();
+    // ---------- STRATEGIES ----------
+    private final GestionPaiement gestionPaiement = new GestionPaiement(new PaiementUneFois());
     private StrategieAffectation strategieAffectation = new AffectationParDisponibilite();
 
     // ---------- Initialisation ----------
@@ -130,6 +131,14 @@ public final class GestionCoursFacade {
         return List.copyOf(creneaux);
     }
 
+    private void sauvegarderSeances() {
+        try {
+            if (repoSea != null) repoSea.ecrireTous(creneaux);
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la sauvegarde des séances : " + e.getMessage());
+        }
+    }
+
     // ---------- Inscriptions ----------
 
     public Inscription inscrireEnfantDans(Creneau c, String nomEnfant, int age) {
@@ -140,7 +149,7 @@ public final class GestionCoursFacade {
 
         try {
             if (repoIns != null) repoIns.append(i);
-            if (repoSea != null) repoSea.ecrireTous(creneaux); // mettre à jour le nbInscrits
+            if (repoSea != null) repoSea.ecrireTous(creneaux);
         } catch (IOException e) {
             System.err.println("Erreur lors de l’inscription : " + e.getMessage());
         }
@@ -150,14 +159,6 @@ public final class GestionCoursFacade {
 
     public List<Inscription> listerInscriptions() {
         return List.copyOf(inscriptions);
-    }
-
-    private void sauvegarderSeances() {
-        try {
-            if (repoSea != null) repoSea.ecrireTous(creneaux);
-        } catch (IOException e) {
-            System.err.println("Erreur lors de la sauvegarde des séances : " + e.getMessage());
-        }
     }
 
     // ---------- Affectation ----------
@@ -179,15 +180,21 @@ public final class GestionCoursFacade {
         return Optional.empty();
     }
 
-    // ---------- Paiement ----------
+    // ---------- Paiement (avec GestionPaiement) ----------
 
     public PlanPaiement calculerPaiement(BigDecimal montant) {
-        return strategiePaiement.calculer(montant);
+        return gestionPaiement.genererPlan(montant);
     }
 
-    public void changerStrategiePaiement(CalculPaiement s) {
-        this.strategiePaiement = s;
+    public void changerStrategiePaiement(CalculPaiement nouvelleStrategie) {
+        gestionPaiement.changerStrategie(nouvelleStrategie);
     }
+
+    public String strategiePaiementActive() {
+        return gestionPaiement.strategieActive();
+    }
+
+    // ---------- Affectation ----------
 
     public void changerStrategieAffectation(StrategieAffectation s) {
         this.strategieAffectation = s;
