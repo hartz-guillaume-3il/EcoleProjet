@@ -1,6 +1,6 @@
-Informatique;2025-10-21T09:00;60;0;Disponible
+Informatique;2025-10-21T09:00;60;0;Fermé
 Réseau;2025-10-21T11:00;90;15;Disponible
-Cybersécurité;2025-10-21T14:00;120;30;Disponible
+Cybersécurité;2025-10-21T14:00;120;31;Disponible
 Dév Web;2025-10-21T17:15;75;0;Disponible
 Java;2025-10-22T09:30;60;10;Disponible
 Langage C;2025-10-22T11:15;90;0;Disponible
