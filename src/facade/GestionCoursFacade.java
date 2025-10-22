@@ -17,6 +17,7 @@ import strategy.paiement.*;
 
 public final class GestionCoursFacade {
     private final GestionnaireUtilisateurs gestionnaireUtilisateurs = GestionnaireUtilisateurs.getInstance();
+    private GestionnaireUtilisateurs user;
     private FichierSeancesRepository repoSea;
     private final CentreNotifications notifications = CentreNotifications.getInstance();
     private final List<Creneau> creneaux = new ArrayList<>();
@@ -198,6 +199,10 @@ public final class GestionCoursFacade {
 
     public void changerStrategieAffectation(StrategieAffectation s) {
         this.strategieAffectation = s;
+    }
+
+    public void ajouterUtilisateur(Utilisateur utilisateur) {
+        this.gestionnaireUtilisateurs.enregistrer(utilisateur);
     }
 
     // ---------- Consultation ----------

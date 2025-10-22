@@ -1,4 +1,3 @@
-// src/main/java/main/Main.java
 package main;
 
 import User.*;
@@ -15,20 +14,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Programme principal testant toutes les fonctionnalités :
- * - Création et enregistrement d’utilisateurs (Factory + Singleton)
- * - Notifications (Observer)
- * - Gestion des créneaux (State)
- * - Calculs de paiement (Strategy)
- * - Simplification des appels (Facade)
- * - Décorateur de notifications (Decorator)
- */
 public class Main {
     public static void main(String[] args) {
 
         System.out.println("=== DÉMONSTRATION DU SYSTÈME COMPLET ===\n");
 
+        // Initialisation des notifications
         NotificationService base = new NotificationServiceBase();
         NotificationService serviceEmail = new NotificationEmail(new NotificationLogger(base));
 
@@ -38,20 +29,34 @@ public class Main {
 
         GestionCoursFacade facade = new GestionCoursFacade();
 
-        System.out.println("\n--- Création des utilisateurs ---");
-        Utilisateur gestionnaire = facade.inscrireUtilisateur(Role.GESTIONNAIRE, Map.of(
+        // --- Création du premier gestionnaire via la Factory directement ---
+        System.out.println("\n--- Création du gestionnaire ---");
+        Utilisateur gestionnaire = UtilisateurFactory.creerUtilisateur(Role.GESTIONNAIRE, Map.of(
                 "email", "admin@mail.com",
                 "motDePasse", "admin123",
                 "nom", "Martin"
         ));
+        facade.ajouterUtilisateur(gestionnaire);
 
+        // --- Ajout d'autres utilisateurs via la façade ---
+        System.out.println("\n--- Création des utilisateurs ---");
+        facade.inscrireUtilisateur(Role.PARENT, Map.of(
+                "email", "parent1@mail.com",
+                "motDePasse", "parent123",
+                "nom", "Durand"
+        ));
+        facade.inscrireUtilisateur(Role.PARENT, Map.of(
+                "email", "parent2@mail.com",
+                "motDePasse", "parent456",
+                "nom", "Lemoine"
+        ));
 
         System.out.println("Utilisateurs enregistrés :");
         for (Utilisateur u : facade.listerUtilisateurs()) {
             System.out.println("- " + u.getEmail() + " (" + u.getRole() + ")");
         }
 
-        // --- State : création et gestion des créneaux ---
+        // --- State : gestion des créneaux ---
         System.out.println("\n--- Gestion des créneaux (State + Observer) ---");
         Creneau c1 = facade.creerCreneau("Maths", LocalDateTime.now().plusDays(1), 2);
         Creneau c2 = facade.creerCreneau("Physique", LocalDateTime.now().plusDays(2), 1);
@@ -72,12 +77,12 @@ public class Main {
                 System.out.println("Échéance : " + e.date() + " -> " + e.montant() + "€")
         );
 
-        // --- Strategy : affectation par disponibilité ---
+        // --- Strategy : affectation ---
         System.out.println("\n--- Affectation (Strategy d’affectation) ---");
         facade.changerStrategieAffectation(new AffectationParDisponibilite());
         facade.affecterEleve("Nina", 11);
 
-        // --- Observer + Decorator : notification manuelle ---
+        // --- Observer + Decorator ---
         System.out.println("\n--- Notification manuelle (Decorator) ---");
         Notification notif = new Notification(
                 TypeEvenement.PAIEMENT_RECU,
@@ -85,7 +90,6 @@ public class Main {
                 Map.of("montant", "180€", "cours", "Maths"));
         serviceEmail.envoyer(notif);
 
-        // --- Résumé final ---
         System.out.println("\n=== TEST TERMINÉ ===");
     }
 }
